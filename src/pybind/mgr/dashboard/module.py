@@ -497,6 +497,7 @@ class Module(MgrModule, CherryPyConfig):
 
     def handle_command(self, inbuf, cmd):
         # pylint: disable=too-many-return-statements
+        logger.error('tomer here!')
         res = handle_option_command(cmd, inbuf)
         if res[0] != -errno.ENOSYS:
             return res

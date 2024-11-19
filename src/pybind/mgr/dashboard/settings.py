@@ -228,6 +228,9 @@ def options_schema_list():
 
 
 def handle_option_command(cmd, inbuf):
+    import logging
+    logger = logging.getLogger(__name__)
+    logger.error(f'TOMER {str(_OPTIONS_COMMAND_MAP)}, {cmd=}, {inbuf}')
     if cmd['prefix'] not in _OPTIONS_COMMAND_MAP:
         return -errno.ENOSYS, '', "Command not found '{}'".format(cmd['prefix'])
 
