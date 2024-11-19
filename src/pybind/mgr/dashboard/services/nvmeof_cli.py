@@ -30,7 +30,7 @@ try:
         '''
         List NVMe-oF gateways
         '''
-        return 0, json.dumps(NVMeoFClient(gw_group=gw_group).stub.list_subsystems(
+        return 0, json.dumps(NVMeoFClient(gw_group='dummygw').stub.list_subsystems(
                     NVMeoFClient.pb2.list_subsystems_req()
                 )), ''
 except Exception as e:
