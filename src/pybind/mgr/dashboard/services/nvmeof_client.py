@@ -7,7 +7,7 @@ from ..exceptions import DashboardException
 from .nvmeof_conf import NvmeofGatewaysConfig
 
 logger = logging.getLogger("nvmeof_client")
-
+logger.error('tomertomer')
 try:
     import grpc  # type: ignore
     import grpc._channel  # type: ignore
@@ -16,6 +16,8 @@ try:
     from .proto import gateway_pb2 as pb2
     from .proto import gateway_pb2_grpc as pb2_grpc
 except ImportError:
+    logger.exception('tomertomer ERRR except')
+    
     grpc = None
 else:
 
