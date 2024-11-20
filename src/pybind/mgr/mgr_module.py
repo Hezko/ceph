@@ -520,7 +520,7 @@ class CLICommand(object):
         import logging
         logger = logging.getLogger(__name__)
         logger.error('blabla dict')
-        logger.error(json.dumps(cmd_dict))
+        logger.error(str(cmd_dict))
         logger.error('end blabla dict')
         kwargs, specials = self._collect_args_by_argspec(cmd_dict)
         if inbuf:
@@ -1955,7 +1955,7 @@ class MgrModule(ceph_module.BaseMgrModule, MgrModuleLoggingMixin):
         import logging
         logger = logging.getLogger(__name__)
         logger.error('hereee commands:')
-        logger.error(json.dumps(CLICommand.COMMANDS))
+        logger.error(str(CLICommand.COMMANDS))
         logger.error('end heree commands')
         return CLICommand.COMMANDS[cmd['prefix']].call(self, cmd, inbuf)
 
