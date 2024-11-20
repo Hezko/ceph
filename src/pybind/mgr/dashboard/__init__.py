@@ -35,6 +35,9 @@ else:
     import logging
     logging.basicConfig(level=logging.DEBUG)
     logging.root.handlers[0].setLevel(logging.DEBUG)
+    fh = logging.FileHandler('/data/code/ceph-ci/build/tomerlog')
+    fh.setLevel(logging.DEBUG)
+    logging.root.addHandler(fh)
     import sys
 
     # Used to allow the running of a tox-based yml doc generator from the dashboard directory
