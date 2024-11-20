@@ -44,6 +44,9 @@ def list_nvmeof_gateways1(_):
     '''
     List NVMe-oF gateways
     '''
+    import logging
+    logger = logging.getLogger(__name__)
+    logger.error('YYYYYYYYYYY')
     return 0, json.dumps(NvmeofGatewaysConfig.get_gateways_config()), ''
 
 
