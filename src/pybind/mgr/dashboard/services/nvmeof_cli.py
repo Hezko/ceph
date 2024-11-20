@@ -8,6 +8,9 @@ from ..rest_client import RequestException
 from .nvmeof_conf import ManagedByOrchestratorException, \
     NvmeofGatewayAlreadyExists, NvmeofGatewaysConfig
 
+import traceback
+import logging
+logger = logging.getLogger(__name__)
 # try:
 #     from ..controllers.nvmeof import NVMeoFSubsystem
 
@@ -34,6 +37,7 @@ try:
                     NVMeoFClient.pb2.list_subsystems_req()
                 )), ''
 except Exception as e:
+    logger.exception('ttttt ex')
     s12 = str(e)
     @CLIReadCommand('dashboard tomer-test-exception-caught')
     def test123(_):
@@ -44,9 +48,11 @@ def list_nvmeof_gateways1(_):
     '''
     List NVMe-oF gateways
     '''
-    import logging
-    logger = logging.getLogger(__name__)
+    
     logger.error('YYYYYYYYYYY')
+    for line in traceback.format_stack():
+        logger.error(line.strip())
+    logger.error('end YYYYYYYYYYY')
     return 0, json.dumps(NvmeofGatewaysConfig.get_gateways_config()), ''
 
 
