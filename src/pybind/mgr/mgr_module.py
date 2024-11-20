@@ -1953,7 +1953,7 @@ class MgrModule(ceph_module.BaseMgrModule, MgrModuleLoggingMixin):
         if cmd['prefix'] not in CLICommand.COMMANDS:
             return self.handle_command(inbuf, cmd)
         import logging
-        logger = logger.getLogger(__name__)
+        logger = logging.getLogger(__name__)
         logger.error('hereee commands:')
         logger.error(json.dumps(CLICommand.COMMANDS))
         logger.error('end heree commands')
