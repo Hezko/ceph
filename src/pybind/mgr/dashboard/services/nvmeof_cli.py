@@ -51,6 +51,7 @@ def list_nvmeof_gateways1(_):
     try:
         from ..services import nvmeof_client as nc
         logger.error(str(dir(nc)))
+        logger.error(f'{str(nc.__name__)}, {str(nc.__file__)}')
         from ..services.nvmeof_client import NVMeoFClient
     except Exception as e:
         logger.exception('ttttt ex')
