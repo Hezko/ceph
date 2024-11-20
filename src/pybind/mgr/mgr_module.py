@@ -517,6 +517,11 @@ class CLICommand(object):
              mgr: Any,
              cmd_dict: Dict[str, Any],
              inbuf: Optional[str] = None) -> HandleCommandResult:
+        import logging
+        logger = logging.getLogger(__name__)
+        logger.error('blabla dict')
+        logger.error(json.dumps(cmd_dict))
+        logger.error('end blabla dict')
         kwargs, specials = self._collect_args_by_argspec(cmd_dict)
         if inbuf:
             if 'inbuf' not in specials:
@@ -1947,7 +1952,11 @@ class MgrModule(ceph_module.BaseMgrModule, MgrModuleLoggingMixin):
                                                       Tuple[int, str, str]]:
         if cmd['prefix'] not in CLICommand.COMMANDS:
             return self.handle_command(inbuf, cmd)
-
+        import logging
+        logger = logger.getLogger(__name__)
+        logger.error('hereee commands:')
+        logger.error(json.dumps(CLICommand.COMMANDS))
+        logger.error('end heree commands')
         return CLICommand.COMMANDS[cmd['prefix']].call(self, cmd, inbuf)
 
     def handle_command(self,
