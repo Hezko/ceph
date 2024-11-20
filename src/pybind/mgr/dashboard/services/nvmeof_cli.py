@@ -43,6 +43,20 @@ except Exception as e:
     def test123(_):
         return 0, json.dumps({"gateways": {}, "bla": s12}), ''
 
+@CLIReadCommand('dashboard import-test')
+def list_nvmeof_gateways1(_):
+    '''
+    List NVMe-oF gateways
+    '''
+    try:
+        from ..services.nvmeof_client import NVMeoFClient
+    except Exception as e:
+        logger.exception('ttttt ex')
+    
+    return 0, json.dumps(NVMeoFClient(gw_group='dummygw').stub.list_subsystems(
+                    NVMeoFClient.pb2.list_subsystems_req()
+                )), ''
+
 @CLIReadCommand('dashboard tomer-test')
 def list_nvmeof_gateways1(_):
     '''
