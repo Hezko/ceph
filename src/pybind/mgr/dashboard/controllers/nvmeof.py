@@ -129,8 +129,17 @@ else:
     try:
         bla = NVMeoFSubsystem()
         bla.list()
+        logger.error('listlistlist')
+        logger.error(f'{str(bla.list())}')
     except Exception as e:
         logger.exception("tomer cc issusss")
+    
+    @CLIReadCommand('dashboard nvmf_subsystem_list')
+    def testtest(_):
+        bla = NVMeoFSubsystem()
+        
+        import json
+        return 0, json.dumps(bla.list()), ''
     
     @APIRouter("/nvmeof/subsystem/{nqn}/listener", Scope.NVME_OF)
     @APIDoc("NVMe-oF Subsystem Listener Management API", "NVMe-oF Subsystem Listener")
