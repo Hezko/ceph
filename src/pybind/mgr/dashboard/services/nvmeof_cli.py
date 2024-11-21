@@ -43,8 +43,16 @@ except Exception as e:
     def test123(_):
         return 0, json.dumps({"gateways": {}, "bla": s12}), ''
 
+@CLIReadCommand('nvmf test')
+def nvmf_test(_):
+    '''
+    List NVMe-oF gateways
+    '''
+    return 0, json.dumps(NvmeofGatewaysConfig.get_gateways_config()), ''
+
+
 @CLIReadCommand('dashboard import-test')
-def list_nvmeof_gateways1(_):
+def list_nvmeof_gateways222(_):
     '''
     List NVMe-oF gateways
     '''

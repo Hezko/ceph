@@ -37,6 +37,7 @@ else:
         logger.error('tomer 123')
         return 0, json.dumps({"gateways": {}}), ''
     
+    logger.error('YYYYYYYYYYY2')
     @APIRouter("/nvmeof/gateway", Scope.NVME_OF)
     @APIDoc("NVMe-oF Gateway Management API", "NVMe-oF Gateway")
     class NVMeoFGateway(RESTController):
@@ -62,7 +63,7 @@ else:
                 return None
 
     
-
+    logger.error('YYYYYYYYYYY2')
     @APIRouter("/nvmeof/subsystem", Scope.NVME_OF)
     @APIDoc("NVMe-oF Subsystem Management API", "NVMe-oF Subsystem")
     class NVMeoFSubsystem(RESTController):
@@ -124,11 +125,12 @@ else:
                     subsystem_nqn=nqn, force=str_to_bool(force)
                 )
             )
+    logger.error(f'tttttaaaa, {str(NVMeoFSubsystem)}')
     try:
         bla = NVMeoFSubsystem()
         bla.list()
     except Exception as e:
-        print(str(e))
+        logger.exception("tomer cc issusss")
     
     @APIRouter("/nvmeof/subsystem/{nqn}/listener", Scope.NVME_OF)
     @APIDoc("NVMe-oF Subsystem Listener Management API", "NVMe-oF Subsystem Listener")
