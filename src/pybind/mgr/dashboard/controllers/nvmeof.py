@@ -4,7 +4,7 @@ from typing import Any, Dict, Optional
 
 from orchestrator import OrchestratorError
 
-from mgr_module import CLIReadCommand, CLIWriteCommand
+from mgr_module import CLIReadCommand, CLIWriteCommand, CLICommand
 from .. import mgr
 from ..model import nvmeof as model
 from ..security import Scope
@@ -64,6 +64,9 @@ else:
 
     
     logger.error('YYYYYYYYYYY2')
+    
+    logger.error('b4def_of_NVMeoFSubsystem')
+    logger.error(str(CLICommand.COMMANDS))
     @APIRouter("/nvmeof/subsystem", Scope.NVME_OF)
     @APIDoc("NVMe-oF Subsystem Management API", "NVMe-oF Subsystem")
     class NVMeoFSubsystem(RESTController):
@@ -125,6 +128,10 @@ else:
                     subsystem_nqn=nqn, force=str_to_bool(force)
                 )
             )
+            
+    logger.error('afterdef_of_NVMeoFSubsystem')
+    logger.error(str(CLICommand.COMMANDS))
+    
     logger.error(f'tttttaaaa, {str(NVMeoFSubsystem)}')
     try:
         bla = NVMeoFSubsystem()
@@ -134,13 +141,19 @@ else:
     except Exception as e:
         logger.exception("tomer cc issusss")
     
-    @CLIReadCommand('dashboard nvmf_subsystem_list')
+    
+    logger.error('b4def_of_nvmf_subsystem_list2')
+    logger.error(str(CLICommand.COMMANDS))
+    @CLIReadCommand('dashboard nvmf_subsystem_list2')
     def testtest(_):
         bla = NVMeoFSubsystem()
-        
+        logger.error('inside nvmf_subsystem_list2')
         import json
         return 0, json.dumps(bla.list()), ''
     
+    
+    logger.error('afterdef_of_nvmf_subsystem_list2')
+    logger.error(str(CLICommand.COMMANDS))
     @APIRouter("/nvmeof/subsystem/{nqn}/listener", Scope.NVME_OF)
     @APIDoc("NVMe-oF Subsystem Listener Management API", "NVMe-oF Subsystem Listener")
     class NVMeoFListener(RESTController):
