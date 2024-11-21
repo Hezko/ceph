@@ -1957,6 +1957,7 @@ class MgrModule(ceph_module.BaseMgrModule, MgrModuleLoggingMixin):
         logger.error('hereee commands:')
         logger.error(str(CLICommand.COMMANDS))
         logger.error('end heree commands')
+        logger.error(f'{str(cmd)}, {cmd['prefix']=}, {str(inbuf)}')
         return CLICommand.COMMANDS[cmd['prefix']].call(self, cmd, inbuf)
 
     def handle_command(self,
