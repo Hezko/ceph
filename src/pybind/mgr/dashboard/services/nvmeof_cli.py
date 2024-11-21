@@ -51,6 +51,17 @@ def nvmf_test(_):
     return 0, json.dumps(NvmeofGatewaysConfig.get_gateways_config()), ''
 
 
+@CLIReadCommand('dashboard real-import-test')
+def list_nvmeof_gateways333321(_):
+    '''
+    List NVMe-oF gateways
+    ''' 
+    from ..controllers import NVMeoFSubsystem
+    obj = NVMeoFSubsystem()
+    
+    
+    return 0, json.dumps(obj.list()), ''
+
 @CLIReadCommand('dashboard import-test')
 def list_nvmeof_gateways222(_):
     '''

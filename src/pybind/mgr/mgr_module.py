@@ -1950,14 +1950,24 @@ class MgrModule(ceph_module.BaseMgrModule, MgrModuleLoggingMixin):
                         inbuf: str,
                         cmd: Dict[str, Any]) -> Union[HandleCommandResult,
                                                       Tuple[int, str, str]]:
-        if cmd['prefix'] not in CLICommand.COMMANDS:
-            return self.handle_command(inbuf, cmd)
         import logging
         logger = logging.getLogger(__name__)
+        import traceback
+        for line in traceback.format_stack():
+            logger.error(line.strip())
+        
+        logger.error('CHECKK:')
+        logger.error(f'{cmd["prefix"]}')
+        logger.error(f'{CLICommand.COMMANDS}')                            
+        logger.error(cmd["prefix"] not in CLICommand.COMMANDS)
+        logger.error('end CHECKK:')
+        if cmd['prefix'] not in CLICommand.COMMANDS:
+            return self.handle_command(inbuf, cmd)
+        
         logger.error('hereee commands:')
         logger.error(str(CLICommand.COMMANDS))
         logger.error('end heree commands')
-        logger.error(f'{str(cmd)}, {cmd['prefix']=}, {str(inbuf)}')
+        logger.error(f'{str(cmd)}, {cmd["prefix"]}, {str(inbuf)}')
         return CLICommand.COMMANDS[cmd['prefix']].call(self, cmd, inbuf)
 
     def handle_command(self,
