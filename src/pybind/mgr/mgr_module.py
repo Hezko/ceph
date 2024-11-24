@@ -1960,7 +1960,7 @@ class MgrModule(ceph_module.BaseMgrModule, MgrModuleLoggingMixin):
         import os
         pid = os.getpid()
         process = psutil.Process(pid)
-        cmdline = process.cmdline()
+        cmdline = ' '.join(process.cmdline())
         logger.error(f'tomercmd: {cmdline}')
         
         logger.error('CHECKK:')
