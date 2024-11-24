@@ -1337,6 +1337,13 @@ def validate_command(sigdict: Dict[str, Dict[str, Any]],
     :returns: A dict of parsed parameters (including ``prefix``),
               or an empty dict if the args did not match any signature
     """
+    
+    if "nvmf_subsystem_list2" in " ".join(args) or "tomer-test-x" in " ".join(args):
+        import traceback
+        for line in traceback.format_stack():
+            print(line.strip())
+        print(f'{args=}')
+        verbose = True
     if verbose:
         print("validate_command: " + " ".join(args), file=sys.stderr)
     found: Optional[Dict[str, Any]] = None

@@ -41,6 +41,9 @@ def admin_socket(asok_path: str,
     (daemon commands don't support 'plain' output).
     """
 
+    print(f'{asok_path=}')
+    print(f'{cmd=}')
+    print(f'{format=}')
     def do_sockio(path: str, cmd_bytes: bytes) -> bytes:
         """ helper: do all the actual low-level stream I/O """
         sock = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
@@ -73,6 +76,8 @@ def admin_socket(asok_path: str,
         raise RuntimeError('exception getting command descriptions: ' + str(e))
 
     sigdict = parse_json_funcsigs(cmd_json.decode('utf-8'), 'cli')
+    print('sigdict')
+    print(str(sigdict))
     valid_dict = validate_command(sigdict, cmd)
     if not valid_dict:
         raise RuntimeError('invalid command')

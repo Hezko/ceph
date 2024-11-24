@@ -43,6 +43,17 @@ except Exception as e:
     def test123(_):
         return 0, json.dumps({"gateways": {}, "bla": s12}), ''
 
+@CLIReadCommand('nvmf param-test')
+def nvmf_param_test(*args, **kwargs):
+    '''
+    List NVMe-oF gateways
+    '''
+    logger.error('tomer-test-x params')
+    logger.error(f'args: {str(args)}')
+    logger.error(f'kwargs: {str(kwargs)}')
+    return 0, json.dumps(NvmeofGatewaysConfig.get_gateways_config()), ''
+
+
 @CLIReadCommand('nvmf test')
 def nvmf_test(_):
     '''
