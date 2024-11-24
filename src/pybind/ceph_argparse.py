@@ -1433,6 +1433,7 @@ def validate_command(sigdict: Dict[str, Dict[str, Any]],
               file=sys.stderr)
         for cmd in bestcmds:
             print(concise_sig(cmd['sig']), file=sys.stderr)
+    print(f"validdict:{str(valid_dict)}")
     return valid_dict
 
 

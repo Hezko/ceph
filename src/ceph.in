@@ -579,8 +579,6 @@ def do_command(parsed_args, target, cmdargs, sigdict, inbuf, verbose):
 
     valid_dict = validate_command(sigdict, cmdargs, verbose)
     # Validate input args against list of sigs
-    print('baaaaa')
-    print(str(valid_dict))
     if valid_dict:
         if parsed_args.output_format:
             valid_dict['format'] = parsed_args.output_format
