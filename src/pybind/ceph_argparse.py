@@ -1343,7 +1343,6 @@ def validate_command(sigdict: Dict[str, Dict[str, Any]],
         for line in traceback.format_stack():
             print(line.strip())
         print(f'{args=}')
-        verbose = True
     if verbose:
         print("validate_command: " + " ".join(args), file=sys.stderr)
     found: Optional[Dict[str, Any]] = None
