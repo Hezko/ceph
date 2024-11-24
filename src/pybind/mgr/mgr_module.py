@@ -1955,6 +1955,13 @@ class MgrModule(ceph_module.BaseMgrModule, MgrModuleLoggingMixin):
         import traceback
         for line in traceback.format_stack():
             logger.error(line.strip())
+            
+        import psutil
+        import os
+        pid = os.getpid()
+        process = psutil.Process(pid)
+        cmdline = process.cmdline()
+        logger.error(f'tomercmd: {cmdline}')
         
         logger.error('CHECKK:')
         logger.error(f'{cmd["prefix"]}')
