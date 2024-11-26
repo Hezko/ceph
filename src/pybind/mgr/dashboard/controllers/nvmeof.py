@@ -42,6 +42,13 @@ else:
     @APIRouter("/nvmeof/gateway", Scope.NVME_OF)
     @APIDoc("NVMe-oF Gateway Management API", "NVMe-oF Gateway")
     class NVMeoFGateway(RESTController):
+        @CLIReadCommand('dashboard tomer-test-inside')
+        def list_nvmeof_gateways(_):
+            '''
+            List NVMe-oF gateways
+            '''
+            return 0, json.dumps({'a':'1'}), ''
+        
         @EndpointDoc("Get information about the NVMeoF gateway")
         @map_model(model.GatewayInfo)
         @handle_nvmeof_error
