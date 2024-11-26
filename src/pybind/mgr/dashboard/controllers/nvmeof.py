@@ -1,8 +1,11 @@
 # -*- coding: utf-8 -*-
 import logging
 from typing import Any, Dict, Optional
+import json
 
 from orchestrator import OrchestratorError
+
+from mgr_module import CLIReadCommand
 
 from .. import mgr
 from ..model import nvmeof as model
@@ -20,12 +23,22 @@ NVME_SCHEMA = {
     "message": (str, "Descriptions")
 }
 
+logger.error('TOMEREHERE')
 try:
     from ..services.nvmeof_client import NVMeoFClient, empty_response, \
         handle_nvmeof_error, map_collection, map_model
 except ImportError as e:
     logger.error("Failed to import NVMeoFClient and related components: %s", e)
 else:
+    logger.error('TOMER222')
+    
+    @CLIReadCommand('dashboard tomer-test')
+    def list_nvmeof_gateways(_):
+        '''
+        List NVMe-oF gateways
+        '''
+        return 0, json.dumps({'a':'1'}), ''
+    
     @APIRouter("/nvmeof/gateway", Scope.NVME_OF)
     @APIDoc("NVMe-oF Gateway Management API", "NVMe-oF Gateway")
     class NVMeoFGateway(RESTController):
