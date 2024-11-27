@@ -50,13 +50,12 @@ def remove_nvmeof_gateway(_, name: str, daemon_name: str = ''):
 
 #TODO: decorator to handle errors
 class NVMeoFGateway(NVMeoFGatewayClient):
-    
     @CLIReadCommand('nvmeof gw list')
     @staticmethod
     def list(_, gw_group: Optional[str] = None):
-        return 0, json.dumps(super(NVMeoFGateway, NVMeoFGateway).list(gw_group)), ''
+        return 0, json.dumps(NVMeoFGatewayClient.list(gw_group)), ''
         
     @CLIReadCommand('nvmeof gw group')
     @staticmethod
     def group(_):
-        return 0, json.dumps(super(NVMeoFGateway, NVMeoFGateway)).group(), ''
+        return 0, json.dumps(NVMeoFGatewayClient.group()), ''

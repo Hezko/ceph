@@ -46,12 +46,12 @@ else:
         @map_model(model.GatewayInfo)
         @handle_nvmeof_error
         def list(self, gw_group: Optional[str] = None):
-            return super().list(gw_group)
+            return NVMeoFGatewayClient.list(gw_group)
 
         @ReadPermission
         @Endpoint('GET')
         def group(self):
-            return super().group()
+            return NVMeoFGatewayClient.group()
 
     @APIRouter("/nvmeof/subsystem", Scope.NVME_OF)
     @APIDoc("NVMe-oF Subsystem Management API", "NVMe-oF Subsystem")
