@@ -59,4 +59,4 @@ class NVMeoFGateway(NVMeoFGatewayClient):
     @CLIReadCommand('nvmeof gw group')
     @staticmethod
     def group(_):
-        return 0, super(NVMeoFGateway, NVMeoFGateway).group(), ''
+        return 0, json.dumps(super(NVMeoFGateway, NVMeoFGateway)).group(), ''
