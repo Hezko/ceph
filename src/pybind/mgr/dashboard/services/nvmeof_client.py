@@ -176,12 +176,14 @@ else:
     from ..services.orchestrator import OrchClient
     
     class NVMeoFGatewayClient():
-        def list(self, gw_group: Optional[str] = None):
+        @staticmethod
+        def list(gw_group: Optional[str] = None):
             return NVMeoFClient(gw_group=gw_group).stub.get_gateway_info(
                 NVMeoFClient.pb2.get_gateway_info_req()
             )
 
-        def group(self):
+        @staticmethod
+        def group():
             try:
                 orch = OrchClient.instance()
                 return orch.services.list(service_type='nvmeof')
