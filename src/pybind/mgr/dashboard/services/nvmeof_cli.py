@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from typing import Optional
 import errno
 import json
 
@@ -7,7 +8,7 @@ from mgr_module import CLICheckNonemptyFileInput, CLIReadCommand, CLIWriteComman
 from ..rest_client import RequestException
 from .nvmeof_conf import ManagedByOrchestratorException, \
     NvmeofGatewayAlreadyExists, NvmeofGatewaysConfig
-
+from .nvmeof_client import NVMeoFGatewayClient
 
 @CLIReadCommand('dashboard nvmeof-gateway-list')
 def list_nvmeof_gateways(_):
@@ -45,3 +46,14 @@ def remove_nvmeof_gateway(_, name: str, daemon_name: str = ''):
         return 0, 'Success', ''
     except ManagedByOrchestratorException as ex:
         return -errno.EINVAL, '', str(ex)
+
+
+#TODO: decorator to handle errors
+class NVMeoFGatewayClient(NVMeoFGatewayClient):
+    @CLIReadCommand('nvmeof gw list')
+    def list(self, gw_group: Optional[str] = None):
+        return 0, json.dumps(super.list(gw_group)), ''
+        
+    @CLIReadCommand('nvmeof gw group')
+    def group(self):
+        return 0, super.group(), ''

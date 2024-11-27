@@ -26,7 +26,7 @@ NVME_SCHEMA = {
 logger.error('TOMEREHERE')
 try:
     from ..services.nvmeof_client import NVMeoFClient, empty_response, \
-        handle_nvmeof_error, map_collection, map_model
+        handle_nvmeof_error, map_collection, map_model, NVMeoFGatewayClient
 except ImportError as e:
     logger.error("Failed to import NVMeoFClient and related components: %s", e)
 else:
@@ -41,34 +41,17 @@ else:
     
     @APIRouter("/nvmeof/gateway", Scope.NVME_OF)
     @APIDoc("NVMe-oF Gateway Management API", "NVMe-oF Gateway")
-    class NVMeoFGateway(RESTController):
-        @CLIReadCommand('dashboard tomer-test-inside')
-        def list_nvmeof_gateways(_):
-            '''
-            List NVMe-oF gateways
-            '''
-            return 0, json.dumps({'a':'1'}), ''
-        
+    class NVMeoFGateway(RESTController, NVMeoFGatewayClient):
         @EndpointDoc("Get information about the NVMeoF gateway")
         @map_model(model.GatewayInfo)
         @handle_nvmeof_error
         def list(self, gw_group: Optional[str] = None):
-            return NVMeoFClient(gw_group=gw_group).stub.get_gateway_info(
-                NVMeoFClient.pb2.get_gateway_info_req()
-            )
+            return super().list(gw_group)
 
         @ReadPermission
         @Endpoint('GET')
         def group(self):
-            try:
-                orch = OrchClient.instance()
-                return orch.services.list(service_type='nvmeof')
-            except OrchestratorError as e:
-                # just return none instead of raising an exception
-                # since we need this to work regardless of the status
-                # of orchestrator in UI
-                logger.error('Failed to fetch the gateway groups: %s', e)
-                return None
+            return super().group()
 
     @APIRouter("/nvmeof/subsystem", Scope.NVME_OF)
     @APIDoc("NVMe-oF Subsystem Management API", "NVMe-oF Subsystem")
