@@ -52,6 +52,9 @@ def remove_nvmeof_gateway(_, name: str, daemon_name: str = ''):
 class NVMeoFGateway(NVMeoFGatewayClient):
     @CLIReadCommand('nvmeof gw info')
     def list(self, gw_group: Optional[str] = None):
+        import logging
+        logger = logging.getLogger(__name__)
+        logger.error(f'TOMER {gw_group=}')
         return 0, json.dumps(NVMeoFGatewayClient.list(gw_group)), ''
         
     @CLIReadCommand('nvmeof gw group')
