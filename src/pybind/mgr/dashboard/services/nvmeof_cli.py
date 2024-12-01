@@ -2,14 +2,14 @@
 from typing import Optional
 import errno
 import json
-
 from mgr_module import CLICheckNonemptyFileInput, CLIReadCommand, CLIWriteCommand
 
 from ..rest_client import RequestException
+from ..model import nvmeof as model
 from .nvmeof_conf import ManagedByOrchestratorException, \
     NvmeofGatewayAlreadyExists, NvmeofGatewaysConfig
-from .nvmeof_client import NVMeoFGatewayClient
-
+from .nvmeof_client import NVMeoFGatewayClient, make_namedtuple_from_object
+        
 @CLIReadCommand('dashboard nvmeof-gateway-list')
 def list_nvmeof_gateways(_):
     '''
@@ -55,7 +55,9 @@ class NVMeoFGateway(NVMeoFGatewayClient):
         import logging
         logger = logging.getLogger(__name__)
         logger.error(f'TOMER {gw_group=}')
-        return 0, json.dumps(NVMeoFGatewayClient.list(gw_group)), ''
+        result = NVMeoFGatewayClient.list(gw_group)
+        result = make_namedtuple_from_object(model.GatewayInfo, result)._asdict()
+        return 0, json.dumps(result), ''
         
     @CLIReadCommand('nvmeof gw group')
     def group(self):
