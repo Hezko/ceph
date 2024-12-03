@@ -7,6 +7,7 @@ from typing import Any, Callable, Dict, List, NamedTuple, Optional, Type
 from mgr_module import HandleCommandResult
 from ..exceptions import DashboardException
 from .nvmeof_conf import NvmeofGatewaysConfig
+from ..tools import str_to_bool
 
 logger = logging.getLogger("nvmeof_client")
 
@@ -195,4 +196,34 @@ else:
         def info(gw_group: Optional[str] = None):
             return NVMeoFClient(gw_group=gw_group).stub.get_gateway_info(
                 NVMeoFClient.pb2.get_gateway_info_req()
+            )
+            
+    class NVMeoFSubsystemClient():
+        @staticmethod
+        def list(gw_group: Optional[str] = None):
+            return NVMeoFClient(gw_group=gw_group).stub.list_subsystems(
+                NVMeoFClient.pb2.list_subsystems_req()
+            )
+
+        @staticmethod
+        def get(nqn: str, gw_group: Optional[str] = None):
+            return NVMeoFClient(gw_group=gw_group).stub.list_subsystems(
+                NVMeoFClient.pb2.list_subsystems_req(subsystem_nqn=nqn)
+            )
+
+        @staticmethod
+        def create(nqn: str, enable_ha: bool, max_namespaces: int = 1024,
+                   gw_group: Optional[str] = None):
+            return NVMeoFClient(gw_group=gw_group).stub.create_subsystem(
+                NVMeoFClient.pb2.create_subsystem_req(
+                    subsystem_nqn=nqn, max_namespaces=max_namespaces, enable_ha=enable_ha
+                )
+            )
+
+        @staticmethod
+        def delete(nqn: str, force: Optional[str] = "false", gw_group: Optional[str] = None):
+            return NVMeoFClient(gw_group=gw_group).stub.delete_subsystem(
+                NVMeoFClient.pb2.delete_subsystem_req(
+                    subsystem_nqn=nqn, force=str_to_bool(force)
+                )
             )

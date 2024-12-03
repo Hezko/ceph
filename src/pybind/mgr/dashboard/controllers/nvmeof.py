@@ -26,7 +26,8 @@ NVME_SCHEMA = {
 logger.error('TOMEREHERE')
 try:
     from ..services.nvmeof_client import NVMeoFClient, empty_response, \
-        handle_nvmeof_error, map_collection, map_model, NVMeoFGatewayClient
+        handle_nvmeof_error, map_collection, map_model, NVMeoFGatewayClient, \
+        NVMeoFSubsystemClient
 except ImportError as e:
     logger.error("Failed to import NVMeoFClient and related components: %s", e)
 else:
@@ -68,9 +69,8 @@ else:
         @map_collection(model.Subsystem, pick="subsystems")
         @handle_nvmeof_error
         def list(self, gw_group: Optional[str] = None):
-            return NVMeoFClient(gw_group=gw_group).stub.list_subsystems(
-                NVMeoFClient.pb2.list_subsystems_req()
-            )
+            return NVMeoFSubsystemClient.list(gw_group)
+            
 
         @EndpointDoc(
             "Get information from a specific NVMeoF subsystem",
@@ -82,9 +82,7 @@ else:
         @map_model(model.Subsystem, first="subsystems")
         @handle_nvmeof_error
         def get(self, nqn: str, gw_group: Optional[str] = None):
-            return NVMeoFClient(gw_group=gw_group).stub.list_subsystems(
-                NVMeoFClient.pb2.list_subsystems_req(subsystem_nqn=nqn)
-            )
+            return NVMeoFSubsystemClient.get(nqn, gw_group)
 
         @EndpointDoc(
             "Create a new NVMeoF subsystem",
@@ -99,11 +97,7 @@ else:
         @handle_nvmeof_error
         def create(self, nqn: str, enable_ha: bool, max_namespaces: int = 1024,
                    gw_group: Optional[str] = None):
-            return NVMeoFClient(gw_group=gw_group).stub.create_subsystem(
-                NVMeoFClient.pb2.create_subsystem_req(
-                    subsystem_nqn=nqn, max_namespaces=max_namespaces, enable_ha=enable_ha
-                )
-            )
+            return NVMeoFSubsystemClient.create(nqn, enable_ha, max_namespaces, gw_group)
 
         @EndpointDoc(
             "Delete an existing NVMeoF subsystem",
@@ -116,11 +110,7 @@ else:
         @empty_response
         @handle_nvmeof_error
         def delete(self, nqn: str, force: Optional[str] = "false", gw_group: Optional[str] = None):
-            return NVMeoFClient(gw_group=gw_group).stub.delete_subsystem(
-                NVMeoFClient.pb2.delete_subsystem_req(
-                    subsystem_nqn=nqn, force=str_to_bool(force)
-                )
-            )
+            return NVMeoFSubsystemClient.delete(nqn, force, gw_group)
 
     @APIRouter("/nvmeof/subsystem/{nqn}/listener", Scope.NVME_OF)
     @APIDoc("NVMe-oF Subsystem Listener Management API", "NVMe-oF Subsystem Listener")
