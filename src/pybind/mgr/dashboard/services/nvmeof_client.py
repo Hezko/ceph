@@ -189,25 +189,10 @@ else:
             func(*args, **kwargs)
 
         return wrapper
-
-    from orchestrator import OrchestratorError
-    from ..services.orchestrator import OrchClient
     
     class NVMeoFGatewayClient():
         @staticmethod
-        def list(gw_group: Optional[str] = None):
+        def info(gw_group: Optional[str] = None):
             return NVMeoFClient(gw_group=gw_group).stub.get_gateway_info(
                 NVMeoFClient.pb2.get_gateway_info_req()
             )
-
-        @staticmethod
-        def group():
-            try:
-                orch = OrchClient.instance()
-                return orch.services.list(service_type='nvmeof')
-            except OrchestratorError as e:
-                # just return none instead of raising an exception
-                # since we need this to work regardless of the status
-                # of orchestrator in UI
-                logger.error('Failed to fetch the gateway groups: %s', e)
-                return None

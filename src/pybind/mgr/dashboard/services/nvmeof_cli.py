@@ -2,7 +2,7 @@
 from typing import Optional
 import errno
 import json
-from mgr_module import CLICheckNonemptyFileInput, CLIReadCommand, CLIWriteCommand
+from mgr_module import CLICheckNonemptyFileInput, CLIReadCommand, CLIWriteCommand, HandleCommandResult
 
 from ..rest_client import RequestException
 from ..model import nvmeof as model
@@ -48,15 +48,11 @@ def remove_nvmeof_gateway(_, name: str, daemon_name: str = ''):
         return -errno.EINVAL, '', str(ex)
 
 
-#TODO: decorator to handle errors
 class NVMeoFGateway(NVMeoFGatewayClient):
     @CLIReadCommand('nvmeof gw info')
     @handle_nvmeof_cli_error
     def list(self, gw_group: Optional[str] = None):
-        import logging
-        logger = logging.getLogger(__name__)
-        logger.error(f'TOMER {gw_group=}')
-        result = NVMeoFGatewayClient.list(gw_group)
+        result = NVMeoFGatewayClient.info(gw_group)
         result = make_dict_from_object(model.GatewayInfo, result)
-        return 0, json.dumps(result), ''
+        return HandleCommandResult(0, json.dumps(result), '')
         

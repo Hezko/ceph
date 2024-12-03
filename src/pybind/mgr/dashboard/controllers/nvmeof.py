@@ -15,7 +15,7 @@ from ..tools import str_to_bool
 from . import APIDoc, APIRouter, BaseController, CreatePermission, \
     DeletePermission, Endpoint, EndpointDoc, Param, ReadPermission, \
     RESTController, UIRouter
-
+    
 logger = logging.getLogger(__name__)
 
 NVME_SCHEMA = {
@@ -46,12 +46,20 @@ else:
         @map_model(model.GatewayInfo)
         @handle_nvmeof_error
         def list(self, gw_group: Optional[str] = None):
-            return NVMeoFGatewayClient.list(gw_group)
+            return NVMeoFGatewayClient.info(gw_group)
 
         @ReadPermission
         @Endpoint('GET')
         def group(self):
-            return NVMeoFGatewayClient.group()
+            try:
+                orch = OrchClient.instance()
+                return orch.services.list(service_type='nvmeof')
+            except OrchestratorError as e:
+                # just return none instead of raising an exception
+                # since we need this to work regardless of the status
+                # of orchestrator in UI
+                logger.error('Failed to fetch the gateway groups: %s', e)
+                return None
 
     @APIRouter("/nvmeof/subsystem", Scope.NVME_OF)
     @APIDoc("NVMe-oF Subsystem Management API", "NVMe-oF Subsystem")
