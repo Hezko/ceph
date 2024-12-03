@@ -80,6 +80,9 @@ else:
             }
         )  # type: ignore
 
+    def make_dict_from_object(cls: Type[NamedTuple], obj: Any) -> Dict:
+        return  make_namedtuple_from_object(cls, obj)._asdict()
+    
     Model = Dict[str, Any]
 
     def map_model(
@@ -98,7 +101,7 @@ else:
                             msg="Not Found", http_status_code=404, component="nvmeof"
                         )
 
-                return make_namedtuple_from_object(model, message)._asdict()
+                return make_dict_from_object(model, message)
 
             return wrapper
 
@@ -117,7 +120,7 @@ else:
                 message = func(*args, **kwargs)
                 collection: Iterable = getattr(message, pick)
                 out = [
-                    make_namedtuple_from_object(model, i)._asdict() for i in collection
+                    make_dict_from_object(model, i) for i in collection
                 ]
                 if finalize:
                     return finalize(message, out)
