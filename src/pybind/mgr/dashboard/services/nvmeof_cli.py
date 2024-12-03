@@ -8,7 +8,7 @@ from ..rest_client import RequestException
 from ..model import nvmeof as model
 from .nvmeof_conf import ManagedByOrchestratorException, \
     NvmeofGatewayAlreadyExists, NvmeofGatewaysConfig
-from .nvmeof_client import NVMeoFGatewayClient, make_dict_from_object
+from .nvmeof_client import NVMeoFGatewayClient, make_dict_from_object, handle_nvmeof_cli_error
         
 @CLIReadCommand('dashboard nvmeof-gateway-list')
 def list_nvmeof_gateways(_):
@@ -51,6 +51,7 @@ def remove_nvmeof_gateway(_, name: str, daemon_name: str = ''):
 #TODO: decorator to handle errors
 class NVMeoFGateway(NVMeoFGatewayClient):
     @CLIReadCommand('nvmeof gw info')
+    @handle_nvmeof_cli_error
     def list(self, gw_group: Optional[str] = None):
         import logging
         logger = logging.getLogger(__name__)

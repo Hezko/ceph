@@ -1,8 +1,10 @@
 import functools
 import logging
+import json
 from collections.abc import Iterable
 from typing import Any, Callable, Dict, List, NamedTuple, Optional, Type
 
+from mgr_module import HandleCommandResult
 from ..exceptions import DashboardException
 from .nvmeof_conf import NvmeofGatewaysConfig
 
@@ -168,6 +170,19 @@ else:
 
         return wrapper
 
+    def handle_nvmeof_cli_error(func: Callable[..., Message]) -> Callable[..., Message]:
+        @functools.wraps(func)
+        def wrapper(*args, **kwargs) -> Message:
+            try:
+                response = func(*args, **kwargs)
+            except grpc._channel._InactiveRpcError as e:  # pylint: disable=protected-access
+                return HandleCommandResult(retval=-errno.EBADRPC, stdout=f"Encountered Inactive RPC Error", stderr=f"Encountered Inactive RPC Error: {e.details()=}, {e.code()}")
+
+            if response.status != 0:
+                return HandleCommandResult(retval=-errno.EINTR, stdout=f"Encountered Application Error", stderr=f"Encountered Inactive RPC Error: {response.error_message=}, {response.status}")
+            return HandleCommandResult(stdout=json.dumps(response))
+
+        return wrapper
     def empty_response(func: Callable[..., Message]) -> Callable[..., None]:
         @functools.wraps(func)
         def wrapper(*args, **kwargs) -> None:
