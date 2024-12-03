@@ -8,7 +8,7 @@ from ..rest_client import RequestException
 from ..model import nvmeof as model
 from .nvmeof_conf import ManagedByOrchestratorException, \
     NvmeofGatewayAlreadyExists, NvmeofGatewaysConfig
-from .nvmeof_client import NVMeoFGatewayClient, make_dict_from_object, handle_nvmeof_cli_error
+from .nvmeof_client import NVMeoFGatewayClient, NVMeoFSubsystemClient, make_dict_from_object, handle_nvmeof_cli_error
         
 @CLIReadCommand('dashboard nvmeof-gateway-list')
 def list_nvmeof_gateways(_):
@@ -48,7 +48,7 @@ def remove_nvmeof_gateway(_, name: str, daemon_name: str = ''):
         return -errno.EINVAL, '', str(ex)
 
 
-class NVMeoFGateway(NVMeoFGatewayClient):
+class NVMeoFGateway:
     @CLIReadCommand('nvmeof gw info')
     @handle_nvmeof_cli_error
     def list(self, gw_group: Optional[str] = None):
@@ -56,3 +56,22 @@ class NVMeoFGateway(NVMeoFGatewayClient):
         result = make_dict_from_object(model.GatewayInfo, result)
         return HandleCommandResult(0, json.dumps(result), '')
         
+class NVMeoFSubsystem:
+    def list(gw_group: Optional[str] = None):
+        result = NVMeoFSubsystemClient.list(gw_group)
+        result = make_dict_from_object(model.Subsystem, result['subsystems'])
+        return HandleCommandResult(0, json.dumps(result), '')
+    
+    def get(nqn: str, gw_group: Optional[str] = None):
+        result = NVMeoFSubsystemClient.list(gw_group)
+        result = make_dict_from_object(model.Subsystem, result['subsystems'][0])
+        return HandleCommandResult(0, json.dumps(result), '')
+    
+    def create(nqn: str, enable_ha: bool, max_namespaces: int = 1024,
+                   gw_group: Optional[str] = None):
+        NVMeoFSubsystemClient.create(nqn, enable_ha, max_namespaces, gw_group)
+        return HandleCommandResult(0, 'Success', '')
+    
+    def delete(nqn: str, force: Optional[str] = "false", gw_group: Optional[str] = None):
+        NVMeoFSubsystemClient.delete(nqn, force, gw_group)
+        return HandleCommandResult(0, 'Success', '')
