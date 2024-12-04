@@ -59,12 +59,10 @@ class NVMeoFGateway:
 class NVMeoFSubsystem:
     def list(gw_group: Optional[str] = None):
         result = NVMeoFSubsystemClient.list(gw_group)
-        result = make_dict_from_object(model.Subsystem, result['subsystems'])
         return HandleCommandResult(0, json.dumps(result), '')
     
     def get(nqn: str, gw_group: Optional[str] = None):
         result = NVMeoFSubsystemClient.list(gw_group)
-        result = make_dict_from_object(model.Subsystem, result['subsystems'][0])
         return HandleCommandResult(0, json.dumps(result), '')
     
     def create(nqn: str, enable_ha: bool, max_namespaces: int = 1024,

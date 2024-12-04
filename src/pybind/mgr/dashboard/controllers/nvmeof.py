@@ -44,7 +44,6 @@ else:
     @APIDoc("NVMe-oF Gateway Management API", "NVMe-oF Gateway")
     class NVMeoFGateway(RESTController, NVMeoFGatewayClient):
         @EndpointDoc("Get information about the NVMeoF gateway")
-        @map_model(model.GatewayInfo)
         @handle_nvmeof_error
         def list(self, gw_group: Optional[str] = None):
             return NVMeoFGatewayClient.info(gw_group)
@@ -66,7 +65,6 @@ else:
     @APIDoc("NVMe-oF Subsystem Management API", "NVMe-oF Subsystem")
     class NVMeoFSubsystem(RESTController):
         @EndpointDoc("List all NVMeoF subsystems")
-        @map_collection(model.Subsystem, pick="subsystems")
         @handle_nvmeof_error
         def list(self, gw_group: Optional[str] = None):
             return NVMeoFSubsystemClient.list(gw_group)
@@ -79,7 +77,6 @@ else:
                 "gw_group": Param(str, "NVMeoF gateway group", True, None),
             },
         )
-        @map_model(model.Subsystem, first="subsystems")
         @handle_nvmeof_error
         def get(self, nqn: str, gw_group: Optional[str] = None):
             return NVMeoFSubsystemClient.get(nqn, gw_group)
@@ -93,11 +90,10 @@ else:
                 "gw_group": Param(str, "NVMeoF gateway group", True, None),
             },
         )
-        @empty_response
         @handle_nvmeof_error
         def create(self, nqn: str, enable_ha: bool, max_namespaces: int = 1024,
                    gw_group: Optional[str] = None):
-            return NVMeoFSubsystemClient.create(nqn, enable_ha, max_namespaces, gw_group)
+            NVMeoFSubsystemClient.create(nqn, enable_ha, max_namespaces, gw_group)
 
         @EndpointDoc(
             "Delete an existing NVMeoF subsystem",
@@ -107,10 +103,9 @@ else:
                 "gw_group": Param(str, "NVMeoF gateway group", True, None),
             },
         )
-        @empty_response
         @handle_nvmeof_error
         def delete(self, nqn: str, force: Optional[str] = "false", gw_group: Optional[str] = None):
-            return NVMeoFSubsystemClient.delete(nqn, force, gw_group)
+            NVMeoFSubsystemClient.delete(nqn, force, gw_group)
 
     @APIRouter("/nvmeof/subsystem/{nqn}/listener", Scope.NVME_OF)
     @APIDoc("NVMe-oF Subsystem Listener Management API", "NVMe-oF Subsystem Listener")
