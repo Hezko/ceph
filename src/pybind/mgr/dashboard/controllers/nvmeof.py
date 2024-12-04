@@ -42,7 +42,7 @@ else:
     
     @APIRouter("/nvmeof/gateway", Scope.NVME_OF)
     @APIDoc("NVMe-oF Gateway Management API", "NVMe-oF Gateway")
-    class NVMeoFGateway(RESTController, NVMeoFGatewayClient):
+    class NVMeoFGateway(RESTController):
         @EndpointDoc("Get information about the NVMeoF gateway")
         @handle_nvmeof_error
         def list(self, gw_group: Optional[str] = None):
