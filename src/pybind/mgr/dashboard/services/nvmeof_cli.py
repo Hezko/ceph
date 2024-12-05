@@ -53,23 +53,26 @@ class NVMeoFGateway:
     @handle_nvmeof_cli_error
     def list(self, gw_group: Optional[str] = None):
         result = NVMeoFGatewayClient.info(gw_group)
-        result = make_dict_from_object(model.GatewayInfo, result)
         return HandleCommandResult(0, json.dumps(result), '')
         
 class NVMeoFSubsystem:
+    @CLIReadCommand('nvmeof subsystem list')
     def list(gw_group: Optional[str] = None):
         result = NVMeoFSubsystemClient.list(gw_group)
         return HandleCommandResult(0, json.dumps(result), '')
     
+    @CLIReadCommand('nvmeof subsystem get')
     def get(nqn: str, gw_group: Optional[str] = None):
-        result = NVMeoFSubsystemClient.list(gw_group)
+        result = NVMeoFSubsystemClient.get(nqn, gw_group)
         return HandleCommandResult(0, json.dumps(result), '')
     
+    @CLIReadCommand('nvmeof subsystem create')
     def create(nqn: str, enable_ha: bool, max_namespaces: int = 1024,
                    gw_group: Optional[str] = None):
         NVMeoFSubsystemClient.create(nqn, enable_ha, max_namespaces, gw_group)
         return HandleCommandResult(0, 'Success', '')
     
+    @CLIReadCommand('nvmeof subsystem delete')
     def delete(nqn: str, force: Optional[str] = "false", gw_group: Optional[str] = None):
         NVMeoFSubsystemClient.delete(nqn, force, gw_group)
         return HandleCommandResult(0, 'Success', '')
