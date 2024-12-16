@@ -1,10 +1,12 @@
 # -*- coding: utf-8 -*-
+from typing import Any, Dict, Optional
 import errno
 import json
 
-from mgr_module import CLICheckNonemptyFileInput, CLIReadCommand, CLIWriteCommand
+from mgr_module import CLICheckNonemptyFileInput, CLIReadCommand, CLIWriteCommand, CLICommand, HandlerFuncType, HandleCommandResult
 
 from ..rest_client import RequestException
+from ..exceptions import DashboardException
 from .nvmeof_conf import ManagedByOrchestratorException, \
     NvmeofGatewayAlreadyExists, NvmeofGatewaysConfig
 
@@ -45,3 +47,25 @@ def remove_nvmeof_gateway(_, name: str, daemon_name: str = ''):
         return 0, 'Success', ''
     except ManagedByOrchestratorException as ex:
         return -errno.EINVAL, '', str(ex)
+
+
+class NvmeofCLICommand(CLICommand):
+    def call(self,
+             mgr: Any,
+             cmd_dict: Dict[str, Any],
+             inbuf: Optional[str] = None) -> HandleCommandResult:
+        print('IN CALL FUNC')
+        try:  # Let's capture exceptions
+            ret = super().call(mgr, cmd_dict, inbuf)
+            import json # REMOVE
+            print(str(cmd_dict)) # REMOVE
+            print(json.dumps(cmd_dict)) # REMOVE
+            # if format == 'plain':
+            #     out =...
+            # elif format == 'json':
+            #     out = ret
+            out=ret # REMOVE
+            return HandleCommandResult(0, out, '')
+        except DashboardException as e:
+            return HandleCommandResult(-e.code, '', e.error_message)
+                

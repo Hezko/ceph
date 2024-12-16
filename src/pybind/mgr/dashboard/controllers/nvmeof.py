@@ -8,6 +8,7 @@ from .. import mgr
 from ..model import nvmeof as model
 from ..security import Scope
 from ..services.orchestrator import OrchClient
+from ..services.nvmeof_cli import NvmeofCLICommand
 from ..tools import str_to_bool
 from . import APIDoc, APIRouter, BaseController, CreatePermission, \
     DeletePermission, Endpoint, EndpointDoc, Param, ReadPermission, \
@@ -30,6 +31,7 @@ else:
     @APIDoc("NVMe-oF Gateway Management API", "NVMe-oF Gateway")
     class NVMeoFGateway(RESTController):
         @EndpointDoc("Get information about the NVMeoF gateway")
+        @NvmeofCLICommand('nvmeof gw info')
         @map_model(model.GatewayInfo)
         @handle_nvmeof_error
         def list(self, gw_group: Optional[str] = None):
@@ -54,6 +56,7 @@ else:
     @APIDoc("NVMe-oF Subsystem Management API", "NVMe-oF Subsystem")
     class NVMeoFSubsystem(RESTController):
         @EndpointDoc("List all NVMeoF subsystems")
+        @NvmeofCLICommand('nvmeof subsystem list')
         @map_collection(model.Subsystem, pick="subsystems")
         @handle_nvmeof_error
         def list(self, gw_group: Optional[str] = None):
