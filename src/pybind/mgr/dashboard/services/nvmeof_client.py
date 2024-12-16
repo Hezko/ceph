@@ -176,13 +176,12 @@ else:
         @functools.wraps(func)
         def wrapper(*args, **kwargs) -> Message:
             try:
-                response = func(*args, **kwargs)
+                return func(*args, **kwargs)
             except grpc._channel._InactiveRpcError as e:  # pylint: disable=protected-access
                 return HandleCommandResult(retval=-errno.EBADRPC, stdout=f"Encountered Inactive RPC Error", stderr=f"Encountered Inactive RPC Error: {e.details()=}, {e.code()}")
-
-            if response.status != 0:
-                return HandleCommandResult(retval=-errno.EINTR, stdout=f"Encountered Application Error", stderr=f"Encountered Inactive RPC Error: {response.error_message=}, {response.status}")
-            return HandleCommandResult(stdout=json.dumps(response))
+            except Exception as e:
+                return HandleCommandResult(retval=-errno.EINTR, stdout=f"Encountered Application Error", stderr=f"Encountered Inactive RPC Error: {str(e)}")
+            
 
         return wrapper
     def empty_response(func: Callable[..., Message]) -> Callable[..., None]:
