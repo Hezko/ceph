@@ -48,18 +48,24 @@ def remove_nvmeof_gateway(_, name: str, daemon_name: str = ''):
     except ManagedByOrchestratorException as ex:
         return -errno.EINVAL, '', str(ex)
 
+import logging
+logger = logging.getLogger(__name__)
+
 
 class NvmeofCLICommand(CLICommand):
     def call(self,
              mgr: Any,
              cmd_dict: Dict[str, Any],
              inbuf: Optional[str] = None) -> HandleCommandResult:
-        print('IN CALL FUNC')
+        logger.error('IN CALL FUNC')
         try:  # Let's capture exceptions
             ret = super().call(mgr, cmd_dict, inbuf)
             import json # REMOVE
-            print(str(cmd_dict)) # REMOVE
-            print(json.dumps(cmd_dict)) # REMOVE
+            logger.error("QQQQ cmd_dict")
+            logger.error(str(cmd_dict)) # REMOVE
+            types = set([str(type(v)) for _, v in cmd_dict.items()])
+            logger.error(','.join(types))
+            logger.error(json.dumps(cmd_dict)) # REMOVE
             # if format == 'plain':
             #     out =...
             # elif format == 'json':
