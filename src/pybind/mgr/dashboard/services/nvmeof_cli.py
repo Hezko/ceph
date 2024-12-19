@@ -74,8 +74,6 @@ class NvmeofCLICommand(CLICommand):
                 out = ret
             elif format == 'yaml':
                 out = yaml.dump(json.loads(ret))
-            
-            out=ret # REMOVE
             return HandleCommandResult(0, out, '')
         except DashboardException as e:
             logger.exception('tomer error')
