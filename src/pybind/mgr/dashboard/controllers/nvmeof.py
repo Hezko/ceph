@@ -55,6 +55,11 @@ else:
     @APIRouter("/nvmeof/subsystem", Scope.NVME_OF)
     @APIDoc("NVMe-oF Subsystem Management API", "NVMe-oF Subsystem")
     class NVMeoFSubsystem(RESTController):
+        @NvmeofCLICommand('nvmeof tomer')
+        def tomer(self, gw_group: Optional[str] = None):
+            import json
+            return json.dumps({"version": "1.3.3", "name": "e386ef4ee1f6", "group": "", "addr": "0.0.0.0", "port": "5500", "load_bal ancing_group": 1, "spdk_version": "24.09"})
+        
         @EndpointDoc("List all NVMeoF subsystems")
         @NvmeofCLICommand('nvmeof subsystem list')
         @map_collection(model.Subsystem, pick="subsystems")
