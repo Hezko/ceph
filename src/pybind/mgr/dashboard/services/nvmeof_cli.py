@@ -73,7 +73,7 @@ class NvmeofCLICommand(CLICommand):
             if format == 'json' or not format:
                 out = ret
             elif format == 'yaml':
-                out = yaml.dumps(json.loads(ret))
+                out = yaml.dump(json.loads(ret))
             
             out=ret # REMOVE
             return HandleCommandResult(0, out, '')
