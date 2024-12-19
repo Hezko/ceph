@@ -67,6 +67,7 @@ class NvmeofCLICommand(CLICommand):
             types = set([str(type(v)) for _, v in CLICommand.COMMANDS.items()])
             logger.error(','.join(types))
             logger.error(json.dumps(cmd_dict)) # REMOVE
+            format  = cmd_dict['format']
             # if format == 'plain':
             #     out =...
             if format == 'json' or not format:
