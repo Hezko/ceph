@@ -63,7 +63,7 @@ class NvmeofCLICommand(CLICommand):
             import json # REMOVE
             logger.error("QQQQ cmd_dict")
             logger.error(str(cmd_dict)) # REMOVE
-            types = set([str(type(v)) for _, v in cmd_dict.items()])
+            types = set([str(type(v)) for _, v in CLICommand.COMMANDS.items()])
             logger.error(','.join(types))
             logger.error(json.dumps(cmd_dict)) # REMOVE
             # if format == 'plain':
