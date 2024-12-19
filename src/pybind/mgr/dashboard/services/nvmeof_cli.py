@@ -2,6 +2,7 @@
 from typing import Any, Dict, Optional
 import errno
 import json
+import yaml
 
 from mgr_module import CLICheckNonemptyFileInput, CLIReadCommand, CLIWriteCommand, CLICommand, HandlerFuncType, HandleCommandResult
 
@@ -68,8 +69,11 @@ class NvmeofCLICommand(CLICommand):
             logger.error(json.dumps(cmd_dict)) # REMOVE
             # if format == 'plain':
             #     out =...
-            # elif format == 'json':
-            #     out = ret
+            if format == 'json' or not format:
+                out = ret
+            elif format == 'yaml':
+                out = yaml.dumps(json.loads(ret))
+            
             out=ret # REMOVE
             return HandleCommandResult(0, out, '')
         except DashboardException as e:
