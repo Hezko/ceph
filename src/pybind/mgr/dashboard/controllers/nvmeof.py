@@ -76,6 +76,7 @@ else:
                 "gw_group": Param(str, "NVMeoF gateway group", True, None),
             },
         )
+        @NvmeofCLICommand('nvmeof subsystem get')
         @map_model(model.Subsystem, first="subsystems")
         @handle_nvmeof_error
         def get(self, nqn: str, gw_group: Optional[str] = None):
@@ -92,6 +93,7 @@ else:
                 "gw_group": Param(str, "NVMeoF gateway group", True, None),
             },
         )
+        @NvmeofCLICommand('nvmeof subsystem create')
         @empty_response
         @handle_nvmeof_error
         def create(self, nqn: str, enable_ha: bool, max_namespaces: int = 1024,
@@ -110,6 +112,7 @@ else:
                 "gw_group": Param(str, "NVMeoF gateway group", True, None),
             },
         )
+        @NvmeofCLICommand('nvmeof subsystem delete')
         @empty_response
         @handle_nvmeof_error
         def delete(self, nqn: str, force: Optional[str] = "false", gw_group: Optional[str] = None):
