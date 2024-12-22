@@ -132,6 +132,7 @@ else:
                 "gw_group": Param(str, "NVMeoF gateway group", True, None),
             },
         )
+        @NvmeofCLICommand('nvmeof listener list')
         @map_collection(model.Listener, pick="listeners")
         @handle_nvmeof_error
         def list(self, nqn: str, gw_group: Optional[str] = None):
@@ -150,6 +151,7 @@ else:
                 "gw_group": Param(str, "NVMeoF gateway group", True, None),
             },
         )
+        @NvmeofCLICommand('nvmeof listener create')
         @empty_response
         @handle_nvmeof_error
         def create(
@@ -182,6 +184,7 @@ else:
                 "gw_group": Param(str, "NVMeoF gateway group", True, None),
             },
         )
+        @NvmeofCLICommand('nvmeof listener delete')
         @empty_response
         @handle_nvmeof_error
         def delete(
