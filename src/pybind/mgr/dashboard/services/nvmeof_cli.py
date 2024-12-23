@@ -77,5 +77,5 @@ class NvmeofCLICommand(CLICommand):
             return HandleCommandResult(0, out, '')
         except DashboardException as e:
             logger.exception('tomer error')
-            return HandleCommandResult(-e.code, '', e.error_message)
+            return HandleCommandResult(-errno.EINVAL, '', e.error_message)
                 
