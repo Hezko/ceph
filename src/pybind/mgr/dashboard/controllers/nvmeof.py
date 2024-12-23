@@ -65,9 +65,23 @@ else:
         @map_collection(model.Subsystem, pick="subsystems")
         @handle_nvmeof_error
         def list(self, gw_group: Optional[str] = None):
-            return NVMeoFClient(gw_group=gw_group).stub.list_subsystems(
-                NVMeoFClient.pb2.list_subsystems_req()
-            )
+            logger.error('PPPPPPP')
+            logger.error('START')
+            logger.error('a')
+            a = NVMeoFClient(gw_group=gw_group)
+            logger.error('b')
+            b = a.stub
+            logger.error('c')
+            c = NVMeoFClient.pb2.list_subsystems_req()
+            logger.error('d')
+            d=b.list_subsystems(c)
+            logger.error('END')
+            return d
+            
+            
+            # return NVMeoFClient(gw_group=gw_group).stub.list_subsystems(
+            #     NVMeoFClient.pb2.list_subsystems_req()
+            # )
 
         @EndpointDoc(
             "Get information from a specific NVMeoF subsystem",
