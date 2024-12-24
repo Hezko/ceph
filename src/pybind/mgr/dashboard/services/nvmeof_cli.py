@@ -69,11 +69,15 @@ class NvmeofCLICommand(CLICommand):
             logger.error(json.dumps(cmd_dict)) # REMOVE
             format  = cmd_dict.get('format')
             if format == 'json' or not format:
+                logger.error('JSONing')
                 out = ret
             elif format == 'yaml':
+                logger.error('YAMLing')
                 out = yaml.dump(json.loads(ret)) 
             else:
+                logger.error(f'return format error {format}') 
                 return HandleCommandResult(-errno.EINVAL, '', f"format '{format}' is not implemented")
+            logger.error(f'returning output: {out}')
             return HandleCommandResult(0, out, '')
         except DashboardException as e:
             logger.exception('tomer error')
