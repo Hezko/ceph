@@ -1945,9 +1945,13 @@ class MgrModule(ceph_module.BaseMgrModule, MgrModuleLoggingMixin):
                         inbuf: str,
                         cmd: Dict[str, Any]) -> Union[HandleCommandResult,
                                                       Tuple[int, str, str]]:
+        import logging
+        logger = logging.getLogger(__name__)
+        logger.error('in _handle_command')
         if cmd['prefix'] not in CLICommand.COMMANDS:
+            logger.error('in _handle_command 1st if')
             return self.handle_command(inbuf, cmd)
-
+        logger.error('in _handle_command b4 return')
         return CLICommand.COMMANDS[cmd['prefix']].call(self, cmd, inbuf)
 
     def handle_command(self,

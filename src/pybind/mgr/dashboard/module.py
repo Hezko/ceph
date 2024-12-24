@@ -497,6 +497,9 @@ class Module(MgrModule, CherryPyConfig):
         return 0, 'Cross-origin URL removed', ''
 
     def handle_command(self, inbuf, cmd):
+        import logging
+        logger = logging.getLogger(__name__)
+        logger.error('in dashboard handle_command')
         # pylint: disable=too-many-return-statements
         res = handle_option_command(cmd, inbuf)
         if res[0] != -errno.ENOSYS:
