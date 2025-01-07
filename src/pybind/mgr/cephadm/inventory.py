@@ -187,11 +187,12 @@ class Inventory:
 
     def add_label(self, host: str, label: str) -> None:
         host = self._get_stored_name(host)
-
+        labels = label.split(',') if ',' in label else [label]
         if 'labels' not in self._inventory[host]:
             self._inventory[host]['labels'] = list()
-        if label not in self._inventory[host]['labels']:
-            self._inventory[host]['labels'].append(label)
+        for label in labels:
+            if label not in self._inventory[host]['labels']:
+                self._inventory[host]['labels'].append(label)
         self.save()
 
     def rm_label(self, host: str, label: str) -> None:
@@ -437,6 +438,7 @@ class SpecStore():
             for key_attr in [
                 'server_key',
                 'client_key',
+                'encryption_key',
             ]:
                 key = getattr(nvmeof_spec, key_attr, None)
                 if key:
@@ -489,6 +491,7 @@ class SpecStore():
             self.mgr.cert_key_store.rm_cert('nvmeof_root_ca_cert', service_name=spec.service_name())
             self.mgr.cert_key_store.rm_key('nvmeof_server_key', service_name=spec.service_name())
             self.mgr.cert_key_store.rm_key('nvmeof_client_key', service_name=spec.service_name())
+            self.mgr.cert_key_store.rm_key('nvmeof_encryption_key', service_name=spec.service_name())
 
     def get_created(self, spec: ServiceSpec) -> Optional[datetime.datetime]:
         return self.spec_created.get(spec.service_name())
@@ -1968,6 +1971,7 @@ class CertKeyStore():
         'ingress_ssl_key',
         'nvmeof_server_key',
         'nvmeof_client_key',
+        'nvmeof_encryption_key',
     ]
 
     known_certs: Dict[str, Any] = {}
@@ -2004,6 +2008,7 @@ class CertKeyStore():
             'ingress_ssl_key': {},  # service-name -> key
             'nvmeof_server_key': {},  # service-name -> key
             'nvmeof_client_key': {},  # service-name -> key
+            'nvmeof_encryption_key': {},  # service-name -> key
         }
 
     def get_cert(self, entity: str, service_name: str = '', host: str = '') -> str:

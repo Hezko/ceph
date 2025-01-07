@@ -588,6 +588,10 @@ scrub_level_t PgScrubber::scrub_requested(
     return scrub_level_t::shallow;
   }
 
+  // abort an ongoing scrub, if it's of the lowest priority
+  // and stuck in replica reservations.
+  m_fsm->process_event(AbortIfReserving{});
+
   // update the relevant SchedTarget (either shallow or deep). Set its urgency
   // to either operator_requested or must_repair. Push it into the queue
   auto& trgt = m_scrub_job->get_target(scrub_level);
@@ -2073,6 +2077,7 @@ void PgScrubber::scrub_finish()
   }
 
   cleanup_on_finish();
+  m_active_target.reset();
   if (do_auto_scrub) {
     request_rescrubbing();
   }
@@ -2299,26 +2304,6 @@ Scrub::schedule_result_t PgScrubber::start_scrub_session(
     }
   }
 
-  // restricting shallow scrubs of PGs that have deep errors:
-  if (pg_cond.has_deep_errors && trgt.is_shallow()) {
-    if (trgt.urgency() < urgency_t::operator_requested) {
-      // if there are deep errors, we should have scheduled a deep scrub first.
-      // If we are here trying to perform a shallow scrub, it means that for some
-      // reason that deep scrub failed to be initiated. We will not try a shallow
-      // scrub until this is solved.
-      dout(10) << __func__ << ": Regular scrub skipped due to deep-scrub errors"
-	       << dendl;
-      requeue_penalized(
-	  s_or_d, delay_both_targets_t::no, delay_cause_t::pg_state, clock_now);
-      return schedule_result_t::target_specific_failure;
-    } else {
-      // we will honor the request anyway, but will report the issue
-      m_osds->clog->error() << fmt::format(
-	  "osd.{} pg {} Regular scrub request, deep-scrub details will be lost",
-	  m_osds->whoami, m_pg_id);
-    }
-  }
-
   // if only explicitly requested repairing is allowed - skip other types
   // of scrubbing
   if (osd_restrictions.allow_requested_repair_only &&
@@ -2433,6 +2418,16 @@ void PgScrubber::dump_active_scrubber(ceph::Formatter* f) const
   } else {
     f->dump_string("schedule", "scrubbing");
   }
+  const auto maybe_register = m_fsm->get_reservation_status();
+  if (maybe_register && maybe_register->m_num_to_reserve != 0) {
+    f->dump_bool("is_reserving_replicas", true);
+    f->dump_int("osd_to_respond", maybe_register->m_osd_to_respond);
+    f->dump_int("duration_seconds", maybe_register->m_duration_seconds);
+    f->dump_int("requested_in_order", maybe_register->m_ordinal_of_requested_replica);
+    f->dump_int("num_to_reserve", maybe_register->m_num_to_reserve);
+  } else {
+    f->dump_bool("is_reserving_replicas", false);
+  }
 }
 
 pg_scrubbing_status_t PgScrubber::get_schedule() const
@@ -2461,7 +2456,7 @@ pg_scrubbing_status_t PgScrubber::get_schedule() const
 	  pg_scrub_sched_status_t::blocked,
 	  true,	 // active
 	  (m_is_deep ? scrub_level_t::deep : scrub_level_t::shallow),
-	  false};
+	  (m_active_target->urgency() == urgency_t::periodic_regular)};
 
     } else {
       int32_t dur_seconds =
@@ -2472,9 +2467,11 @@ pg_scrubbing_status_t PgScrubber::get_schedule() const
 	  pg_scrub_sched_status_t::active,
 	  true,	 // active
 	  (m_is_deep ? scrub_level_t::deep : scrub_level_t::shallow),
-	  false /* is periodic? unknown, actually */};
+	  (m_active_target->urgency() == urgency_t::periodic_regular)};
     }
   }
+
+  // not registered to be scrubbed?
   if (!m_scrub_job->is_registered()) {
     return pg_scrubbing_status_t{
 	utime_t{},
@@ -2485,8 +2482,34 @@ pg_scrubbing_status_t PgScrubber::get_schedule() const
 	false};
   }
 
-  // not taking 'no-*scrub' flags into account here.
+  // in session, but still reserving replicas?
+  const auto maybe_register = m_fsm->get_reservation_status();
+  if (maybe_register) {
+    // note that if we are here, we are scrubbing (even though
+    // m_active is false). The 'maybe_register' attests to being in
+    // ReservingReplicas state, and m_active wasn't set yet.
+    dout(20) << fmt::format(
+		    "{}:maybe_register: osd:{} {}s ({} of {})", __func__,
+		    maybe_register->m_osd_to_respond,
+		    maybe_register->m_duration_seconds,
+		    maybe_register->m_ordinal_of_requested_replica,
+		    maybe_register->m_num_to_reserve)
+	     << dendl;
+    return pg_scrubbing_status_t{
+	utime_t{},
+	maybe_register->m_duration_seconds,
+	pg_scrub_sched_status_t::active,
+	true,  // active
+	(m_is_deep ? scrub_level_t::deep : scrub_level_t::shallow),
+	(m_active_target->urgency() == urgency_t::periodic_regular),
+	maybe_register->m_osd_to_respond,
+	maybe_register->m_ordinal_of_requested_replica,
+	maybe_register->m_num_to_reserve};
+  }
+
   const auto first_ready = m_scrub_job->earliest_eligible(now_is);
+  // eligible for scrubbing, but not yet selected to be scrubbed?
+  // (not taking 'no-*scrub' flags into account here.)
   if (first_ready) {
     const auto& targ = first_ready->get();
     return pg_scrubbing_status_t{
