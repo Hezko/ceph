@@ -1,15 +1,18 @@
 # -*- coding: utf-8 -*-
-from typing import Optional
+from typing import Any, Dict, Optional
 import errno
 import json
-from mgr_module import CLICheckNonemptyFileInput, CLIReadCommand, CLIWriteCommand, HandleCommandResult
+import yaml
+from mgr_module import CLICheckNonemptyFileInput, CLIReadCommand, CLIWriteCommand, HandleCommandResult, CLICommand, HandlerFuncType, HandleCommandResult
 
 from ..rest_client import RequestException
 from ..model import nvmeof as model
 from .nvmeof_conf import ManagedByOrchestratorException, \
     NvmeofGatewayAlreadyExists, NvmeofGatewaysConfig
 from .nvmeof_client import NVMeoFGatewayClient, NVMeoFSubsystemClient, make_dict_from_object, handle_nvmeof_cli_error
-        
+from ..exceptions import DashboardException
+
+
 @CLIReadCommand('dashboard nvmeof-gateway-list')
 def list_nvmeof_gateways(_):
     '''
@@ -55,12 +58,37 @@ class NVMeoFGateway:
         result = NVMeoFGatewayClient.info(gw_group)
         return HandleCommandResult(0, json.dumps(result), '')
         
+        
+class NvmeofCLICommand(CLICommand):
+    def call(self,
+             mgr: Any,
+             cmd_dict: Dict[str, Any],
+             inbuf: Optional[str] = None) -> HandleCommandResult:
+        try:
+            ret = super().call(mgr, cmd_dict, inbuf)
+            format  = cmd_dict.get('format')
+            if format == 'json' or not format:
+                out = ret
+            elif format == 'yaml':
+                out = yaml.dump(json.loads(ret)) 
+            else:
+                return HandleCommandResult(-errno.EINVAL, '', f"format '{format}' is not implemented")
+            return HandleCommandResult(0, out, '')
+        except DashboardException as e:
+            return HandleCommandResult(-errno.EINVAL, '', str(e))
+        
+        
 class NVMeoFSubsystem:
     @CLIReadCommand('nvmeof subsystem list')
     @handle_nvmeof_cli_error
     def list(self, gw_group: Optional[str] = None):
         result = NVMeoFSubsystemClient.list(gw_group)
         return HandleCommandResult(0, json.dumps(result), '')
+    
+    @NvmeofCLICommand('nvmeof2 subsystem list')
+    def list(self, gw_group: Optional[str] = None):
+        return NVMeoFSubsystemClient.list(gw_group)
+        
     
     @CLIReadCommand('nvmeof subsystem get')
     @handle_nvmeof_cli_error
@@ -80,3 +108,5 @@ class NVMeoFSubsystem:
     def delete(self, nqn: str, force: Optional[str] = "false", gw_group: Optional[str] = None):
         NVMeoFSubsystemClient.delete(nqn, force, gw_group)
         return HandleCommandResult(0, 'Success', '')
+    
+    
