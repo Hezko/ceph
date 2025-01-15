@@ -56,6 +56,7 @@ else:
     @APIDoc("NVMe-oF Subsystem Management API", "NVMe-oF Subsystem")
     class NVMeoFSubsystem(RESTController):
         @EndpointDoc("List all NVMeoF subsystems")
+        @NvmeofCLICommand("nvmeof subsystem list")
         @map_collection(model.Subsystem, pick="subsystems")
         @handle_nvmeof_error
         def list(self, gw_group: Optional[str] = None):
@@ -70,6 +71,7 @@ else:
                 "gw_group": Param(str, "NVMeoF gateway group", True, None),
             },
         )
+        @NvmeofCLICommand("nvmeof subsystem get")
         @map_model(model.Subsystem, first="subsystems")
         @handle_nvmeof_error
         def get(self, nqn: str, gw_group: Optional[str] = None):
@@ -86,6 +88,7 @@ else:
                 "gw_group": Param(str, "NVMeoF gateway group", True, None),
             },
         )
+        @NvmeofCLICommand("nvmeof subsystem add")
         @empty_response
         @handle_nvmeof_error
         def create(self, nqn: str, enable_ha: bool, max_namespaces: int = 1024,
@@ -104,6 +107,7 @@ else:
                 "gw_group": Param(str, "NVMeoF gateway group", True, None),
             },
         )
+        @NvmeofCLICommand("nvmeof subsystem del")
         @empty_response
         @handle_nvmeof_error
         def delete(self, nqn: str, force: Optional[str] = "false", gw_group: Optional[str] = None):
@@ -123,6 +127,7 @@ else:
                 "gw_group": Param(str, "NVMeoF gateway group", True, None),
             },
         )
+        @NvmeofCLICommand("nvmeof listerer list")
         @map_collection(model.Listener, pick="listeners")
         @handle_nvmeof_error
         def list(self, nqn: str, gw_group: Optional[str] = None):
@@ -141,6 +146,7 @@ else:
                 "gw_group": Param(str, "NVMeoF gateway group", True, None),
             },
         )
+        @NvmeofCLICommand("nvmeof listerer add")
         @empty_response
         @handle_nvmeof_error
         def create(
@@ -173,6 +179,7 @@ else:
                 "gw_group": Param(str, "NVMeoF gateway group", True, None),
             },
         )
+        @NvmeofCLICommand("nvmeof listerer del")
         @empty_response
         @handle_nvmeof_error
         def delete(
@@ -206,6 +213,7 @@ else:
                 "gw_group": Param(str, "NVMeoF gateway group", True, None),
             },
         )
+        @NvmeofCLICommand("nvmeof ns list")
         @map_collection(model.Namespace, pick="namespaces")
         @handle_nvmeof_error
         def list(self, nqn: str, gw_group: Optional[str] = None):
@@ -221,6 +229,7 @@ else:
                 "gw_group": Param(str, "NVMeoF gateway group", True, None),
             },
         )
+        @NvmeofCLICommand("nvmeof ns get")
         @map_model(model.Namespace, first="namespaces")
         @handle_nvmeof_error
         def get(self, nqn: str, nsid: str, gw_group: Optional[str] = None):
@@ -238,6 +247,7 @@ else:
                 "gw_group": Param(str, "NVMeoF gateway group", True, None),
             },
         )
+        @NvmeofCLICommand("nvmeof ns get_io_stats")
         @map_model(model.NamespaceIOStats)
         @handle_nvmeof_error
         def io_stats(self, nqn: str, nsid: str, gw_group: Optional[str] = None):
@@ -259,6 +269,7 @@ else:
                 "gw_group": Param(str, "NVMeoF gateway group", True, None),
             },
         )
+        @NvmeofCLICommand("nvmeof ns add")
         @map_model(model.NamespaceCreation)
         @handle_nvmeof_error
         def create(
@@ -298,6 +309,7 @@ else:
                 "gw_group": Param(str, "NVMeoF gateway group", True, None),
             },
         )
+        @NvmeofCLICommand("nvmeof ns update")
         @empty_response
         @handle_nvmeof_error
         def update(
@@ -362,6 +374,7 @@ else:
                 "gw_group": Param(str, "NVMeoF gateway group", True, None),
             },
         )
+        @NvmeofCLICommand("nvmeof ns del")
         @empty_response
         @handle_nvmeof_error
         def delete(self, nqn: str, nsid: str, gw_group: Optional[str] = None):
@@ -380,6 +393,7 @@ else:
                 "gw_group": Param(str, "NVMeoF gateway group", True, None),
             },
         )
+        @NvmeofCLICommand("nvmeof host list")
         @map_collection(
             model.Host,
             pick="hosts",
@@ -402,6 +416,7 @@ else:
                 "gw_group": Param(str, "NVMeoF gateway group", True, None),
             },
         )
+        @NvmeofCLICommand("nvmeof host add")
         @empty_response
         @handle_nvmeof_error
         def create(self, nqn: str, host_nqn: str, gw_group: Optional[str] = None):
@@ -417,6 +432,7 @@ else:
                 "gw_group": Param(str, "NVMeoF gateway group", True, None),
             },
         )
+        @NvmeofCLICommand("nvmeof host del")
         @empty_response
         @handle_nvmeof_error
         def delete(self, nqn: str, host_nqn: str, gw_group: Optional[str] = None):
@@ -434,6 +450,7 @@ else:
                 "gw_group": Param(str, "NVMeoF gateway group", True, None),
             },
         )
+        @NvmeofCLICommand("nvmeof connection list")
         @map_collection(model.Connection, pick="connections")
         @handle_nvmeof_error
         def list(self, nqn: str, gw_group: Optional[str] = None):
