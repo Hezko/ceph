@@ -60,9 +60,15 @@ class NvmeofCLICommand(CLICommand):
             ret = super().call(mgr, cmd_dict, inbuf)
             format = cmd_dict.get('format')
             if format == 'json' or not format:
-                out = json.dumps(ret)
+                if ret is None:
+                    out = ''
+                else:
+                    out = json.dumps(ret)
             elif format == 'yaml':
-                out = yaml.dump(ret)
+                if ret is None:
+                    out = ''
+                else:
+                    out = yaml.dump(ret)
             else:
                 return HandleCommandResult(-errno.EINVAL, '',
                                            f"format '{format}' is not implemented")
