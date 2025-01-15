@@ -7,7 +7,7 @@ from orchestrator import OrchestratorError
 from .. import mgr
 from ..model import nvmeof as model
 from ..security import Scope
-from ..services.nvmeof_cli import NvmeofCLICommand
+from ..services.nvmeof_cli import NvmeofCLICommand, OutputModifiers
 from ..services.orchestrator import OrchClient
 from ..tools import str_to_bool
 from . import APIDoc, APIRouter, BaseController, CreatePermission, \
@@ -239,7 +239,7 @@ else:
                 "gw_group": Param(str, "NVMeoF gateway group", True, None),
             },
         )
-        @NvmeofCLICommand("nvmeof subsystem add")
+        @NvmeofCLICommand("nvmeof subsystem add", out_modifier=OutputModifiers.subsystem_add)
         @empty_response
         @handle_nvmeof_error
         def create(self, nqn: str, enable_ha: bool, max_namespaces: int = 1024,
@@ -258,7 +258,7 @@ else:
                 "gw_group": Param(str, "NVMeoF gateway group", True, None),
             },
         )
-        @NvmeofCLICommand("nvmeof subsystem del")
+        @NvmeofCLICommand("nvmeof subsystem del", out_modifier=OutputModifiers.subsystem_del)
         @empty_response
         @handle_nvmeof_error
         def delete(self, nqn: str, force: Optional[str] = "false", gw_group: Optional[str] = None):
@@ -297,7 +297,7 @@ else:
                 "gw_group": Param(str, "NVMeoF gateway group", True, None),
             },
         )
-        @NvmeofCLICommand("nvmeof listener add")
+        @NvmeofCLICommand("nvmeof listener add", out_modifier=OutputModifiers.listener_add)
         @empty_response
         @handle_nvmeof_error
         def create(
@@ -330,7 +330,7 @@ else:
                 "gw_group": Param(str, "NVMeoF gateway group", True, None),
             },
         )
-        @NvmeofCLICommand("nvmeof listener del")
+        @NvmeofCLICommand("nvmeof listener del", out_modifier=OutputModifiers.listener_del)
         @empty_response
         @handle_nvmeof_error
         def delete(
@@ -420,7 +420,7 @@ else:
                 "gw_group": Param(str, "NVMeoF gateway group", True, None),
             },
         )
-        @NvmeofCLICommand("nvmeof ns add")
+        @NvmeofCLICommand("nvmeof ns add", out_modifier=OutputModifiers.namespace_add)
         @map_model(model.NamespaceCreation)
         @handle_nvmeof_error
         def create(
@@ -525,7 +525,7 @@ else:
                 "gw_group": Param(str, "NVMeoF gateway group", True, None),
             },
         )
-        @NvmeofCLICommand("nvmeof ns del")
+        @NvmeofCLICommand("nvmeof ns del", out_modifier=OutputModifiers.namespace_del)
         @empty_response
         @handle_nvmeof_error
         def delete(self, nqn: str, nsid: str, gw_group: Optional[str] = None):
@@ -567,7 +567,7 @@ else:
                 "gw_group": Param(str, "NVMeoF gateway group", True, None),
             },
         )
-        @NvmeofCLICommand("nvmeof host add")
+        @NvmeofCLICommand("nvmeof host add", out_modifier=OutputModifiers.host_add)
         @empty_response
         @handle_nvmeof_error
         def create(self, nqn: str, host_nqn: str, gw_group: Optional[str] = None):
@@ -583,7 +583,7 @@ else:
                 "gw_group": Param(str, "NVMeoF gateway group", True, None),
             },
         )
-        @NvmeofCLICommand("nvmeof host del")
+        @NvmeofCLICommand("nvmeof host del", out_modifier=OutputModifiers.host_del)
         @empty_response
         @handle_nvmeof_error
         def delete(self, nqn: str, host_nqn: str, gw_group: Optional[str] = None):
