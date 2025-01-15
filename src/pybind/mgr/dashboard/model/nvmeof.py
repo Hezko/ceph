@@ -1,4 +1,4 @@
-from typing import NamedTuple, Optional
+from typing import NamedTuple, Optional, List
 
 
 class GatewayInfo(NamedTuple):
@@ -10,6 +10,23 @@ class GatewayInfo(NamedTuple):
     port: int
     load_balancing_group: int
     spdk_version: Optional[str] = ""
+    
+    
+class GatewayVersion(NamedTuple):
+    version: str
+    
+    
+class GatewayLogLevelInfo(NamedTuple):
+    status: int
+    error_message: str
+    log_level: int
+
+
+class SpdkNvmfLogFlagsAndLevelInfo(NamedTuple):
+    status: int
+    error_message: str
+    log_level: int
+    log_print_level: int
 
 
 class GatewayVersion(NamedTuple):
