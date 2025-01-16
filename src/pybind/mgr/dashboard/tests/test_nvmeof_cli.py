@@ -1,84 +1,87 @@
 import errno
-import unittest
-import pytest
 from unittest.mock import MagicMock
 
-from mgr_module import HandleCommandResult
-from ..services.nvmeof_cli import NvmeofCLICommand
-from ..services import nvmeof_cli as nvmeof_cli_module
+import pytest
+from mgr_module import CLICommand, HandleCommandResult
 
-@pytest.fixture(scope="class")
-def sample_command(self):
+from ..services.nvmeof_cli import NvmeofCLICommand
+
+
+@pytest.fixture(scope="class", name="sample_command")
+def fixture_sample_command():
     test_cmd = "test command"
+
     @NvmeofCLICommand(test_cmd)
-    def func(_):
-        return {'a': '1', 'b':2 }
+    def func(_): # noqa # pylint: disable=unused-variable
+        return {'a': '1', 'b': 2}
     yield test_cmd
     del NvmeofCLICommand.COMMANDS[test_cmd]
     assert test_cmd not in NvmeofCLICommand.COMMANDS
-    
-class NvmeofCLICommandTest(unittest.TestCase):
+
+
+@pytest.fixture(name='base_call_mock')
+def fixture_base_call_mock(monkeypatch):
+    mock_result = {'a': 'b'}
+    super_mock = MagicMock()
+    super_mock.return_value = mock_result
+    monkeypatch.setattr(CLICommand, 'call', super_mock)
+    return super_mock
+
+
+@pytest.fixture(name='base_call_return_none_mock')
+def fixture_base_call_return_none_mock(monkeypatch):
+    mock_result = None
+    super_mock = MagicMock()
+    super_mock.return_value = mock_result
+    monkeypatch.setattr(CLICommand, 'call', super_mock)
+    return super_mock
+
+
+class TestNvmeofCLICommand:
     def test_command_being_added(self, sample_command):
         assert sample_command in NvmeofCLICommand.COMMANDS
-        assert type(NvmeofCLICommand.COMMANDS[sample_command]) is NvmeofCLICommand
-            
-    def test_command_return_cmd_result_default_format(self, monkeypatch, sample_command):
-        mock_result = {'a':'b'}
-        super_mock = MagicMock()
-        super_mock.call.return_value = mock_result
-        monkeypatch.setattr(nvmeof_cli_module, 'super', super_mock)
-        
+        assert isinstance(NvmeofCLICommand.COMMANDS[sample_command], NvmeofCLICommand)
+
+    def test_command_return_cmd_result_default_format(self, base_call_mock, sample_command):
         result = NvmeofCLICommand.COMMANDS[sample_command].call(MagicMock(), {})
-        assert type(result) is HandleCommandResult
+        assert isinstance(result, HandleCommandResult)
         assert result.retval == 0
         assert result.stdout == '{"a": "b"}'
         assert result.stderr == ''
-        
-    def test_command_return_cmd_result_json_format(self, monkeypatch, sample_command):
-        mock_result = {'a':'b'}
-        super_mock = MagicMock()
-        super_mock.call.return_value = mock_result
-        monkeypatch.setattr(nvmeof_cli_module, 'super', super_mock)
-        
+        base_call_mock.assert_called_once()
+
+    def test_command_return_cmd_result_json_format(self, base_call_mock, sample_command):
         result = NvmeofCLICommand.COMMANDS[sample_command].call(MagicMock(), {'format': 'json'})
-        assert type(result) is HandleCommandResult
+        assert isinstance(result, HandleCommandResult)
         assert result.retval == 0
         assert result.stdout == '{"a": "b"}'
         assert result.stderr == ''
-        
-    def test_command_return_cmd_result_yaml_format(self, monkeypatch, sample_command):
-        mock_result = {'a':'b'}
-        super_mock = MagicMock()
-        super_mock.call.return_value = mock_result
-        monkeypatch.setattr(nvmeof_cli_module, 'super', super_mock)
-        
+        base_call_mock.assert_called_once()
+
+    def test_command_return_cmd_result_yaml_format(self, base_call_mock, sample_command):
         result = NvmeofCLICommand.COMMANDS[sample_command].call(MagicMock(), {'format': 'yaml'})
-        assert type(result) is HandleCommandResult
+        assert isinstance(result, HandleCommandResult)
         assert result.retval == 0
         assert result.stdout == 'a: b\n'
         assert result.stderr == ''
-        
-    def test_command_return_cmd_result_invalid_format(self, monkeypatch, sample_command):
-        mock_result = {'a':'b'}
+        base_call_mock.assert_called_once()
+
+    def test_command_return_cmd_result_invalid_format(self, base_call_mock, sample_command):
+        mock_result = {'a': 'b'}
         super_mock = MagicMock()
         super_mock.call.return_value = mock_result
-        monkeypatch.setattr(nvmeof_cli_module, 'super', super_mock)
-        
+
         result = NvmeofCLICommand.COMMANDS[sample_command].call(MagicMock(), {'format': 'invalid'})
-        assert type(result) is HandleCommandResult
+        assert isinstance(result, HandleCommandResult)
         assert result.retval == -errno.EINVAL
         assert result.stdout == ''
-        assert result.stderr 
-        
-    def test_command_return_empty_cmd_result(self, monkeypatch, sample_command):
-        mock_result = None
-        super_mock = MagicMock()
-        super_mock.call.return_value = mock_result
-        monkeypatch.setattr(nvmeof_cli_module, 'super', super_mock)
-        
+        assert result.stderr
+        base_call_mock.assert_called_once()
+
+    def test_command_return_empty_cmd_result(self, base_call_return_none_mock, sample_command):
         result = NvmeofCLICommand.COMMANDS[sample_command].call(MagicMock(), {})
-        assert type(result) is HandleCommandResult
+        assert isinstance(result, HandleCommandResult)
         assert result.retval == 0
         assert result.stdout == ''
         assert result.stderr == ''
-        
+        base_call_return_none_mock.assert_called_once()

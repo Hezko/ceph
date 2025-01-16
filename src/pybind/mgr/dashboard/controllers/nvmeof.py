@@ -7,12 +7,12 @@ from orchestrator import OrchestratorError
 from .. import mgr
 from ..model import nvmeof as model
 from ..security import Scope
+from ..services.nvmeof_cli import NvmeofCLICommand
 from ..services.orchestrator import OrchClient
 from ..tools import str_to_bool
 from . import APIDoc, APIRouter, BaseController, CreatePermission, \
     DeletePermission, Endpoint, EndpointDoc, Param, ReadPermission, \
     RESTController, UIRouter
-from ..services.nvmeof_cli import NvmeofCLICommand
 
 logger = logging.getLogger(__name__)
 
@@ -103,7 +103,7 @@ else:
             "Delete an existing NVMeoF subsystem",
             parameters={
                 "nqn": Param(str, "NVMeoF subsystem NQN"),
-                "force": Param(bool, "Force delete", "false"),
+                "force": Param(bool, "Force delete", True, False),
                 "gw_group": Param(str, "NVMeoF gateway group", True, None),
             },
         )
