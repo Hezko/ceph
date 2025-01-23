@@ -164,7 +164,7 @@ else:
             },
         )
         @NvmeofCLICommand("nvmeof subsystem add")
-        @empty_response
+        @map_model(model.SubsystemStatus)
         @handle_nvmeof_error
         def create(self, nqn: str, enable_ha: bool, max_namespaces: int = 1024,
                    gw_group: Optional[str] = None):
@@ -183,7 +183,7 @@ else:
             },
         )
         @NvmeofCLICommand("nvmeof subsystem del")
-        @empty_response
+        @map_model(model.RequestStatus)
         @handle_nvmeof_error
         def delete(self, nqn: str, force: Optional[str] = "false", gw_group: Optional[str] = None):
             return NVMeoFClient(gw_group=gw_group).stub.delete_subsystem(
@@ -222,7 +222,7 @@ else:
             },
         )
         @NvmeofCLICommand("nvmeof listerer add")
-        @empty_response
+        @map_model(model.RequestStatus)
         @handle_nvmeof_error
         def create(
             self,
@@ -255,7 +255,7 @@ else:
             },
         )
         @NvmeofCLICommand("nvmeof listerer del")
-        @empty_response
+        @map_model(model.RequestStatus)
         @handle_nvmeof_error
         def delete(
             self,
@@ -450,7 +450,7 @@ else:
             },
         )
         @NvmeofCLICommand("nvmeof ns del")
-        @empty_response
+        @map_model(model.RequestStatus)
         @handle_nvmeof_error
         def delete(self, nqn: str, nsid: str, gw_group: Optional[str] = None):
             return NVMeoFClient(gw_group=gw_group).stub.namespace_delete(
@@ -492,7 +492,7 @@ else:
             },
         )
         @NvmeofCLICommand("nvmeof host add")
-        @empty_response
+        @map_model(model.RequestStatus)
         @handle_nvmeof_error
         def create(self, nqn: str, host_nqn: str, gw_group: Optional[str] = None):
             return NVMeoFClient(gw_group=gw_group).stub.add_host(
@@ -508,7 +508,7 @@ else:
             },
         )
         @NvmeofCLICommand("nvmeof host del")
-        @empty_response
+        @map_model(model.RequestStatus)
         @handle_nvmeof_error
         def delete(self, nqn: str, host_nqn: str, gw_group: Optional[str] = None):
             return NVMeoFClient(gw_group=gw_group).stub.remove_host(

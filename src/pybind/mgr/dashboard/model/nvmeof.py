@@ -112,3 +112,8 @@ class Host(NamedTuple):
 class RequestStatus(NamedTuple):
     status: int
     error_message: str
+    
+class SubsystemStatus(NamedTuple):
+    status: int
+    error_message: str
+    nqn: str
