@@ -1,7 +1,7 @@
 import functools
 import logging
 from collections.abc import Iterable
-from typing import Any, Callable, Dict, List, NamedTuple, Optional, Type
+from typing import Any, Callable, Dict, List, NamedTuple, Optional, Type, Generator
 
 from ..exceptions import DashboardException
 from .nvmeof_conf import NvmeofGatewaysConfig
@@ -171,3 +171,65 @@ else:
             func(*args, **kwargs)
 
         return wrapper
+
+
+    class MaxRecursionDepthError(Exception):
+        pass
+
+
+    def json_to_namedtuple(data: Dict, target_type: Type[NamedTuple], max_depth: int = 4) -> NamedTuple:
+        """
+        Convert a JSON object to a NamedTuple, handling nesting and lists lazily.
+        This will raise an error if nesting depth exceeds the max depth (default 4) 
+        to avoid bloating the memory in case of mutual references between objects.
+
+        :param data: The input JSON as a Python dictionary
+        :param target_type: The target NamedTuple type
+        :param max_depth: The maximum depth allowed for recursion
+        :return: An instance of the target NamedTuple with fields populated from the JSON
+        """
+
+        if not isinstance(target_type, type) or not hasattr(target_type, '_fields'):
+            raise TypeError("target_type must be a NamedTuple type.")
+
+        def convert(value, field_type, depth) -> Generator:
+            if depth > max_depth:
+                raise MaxRecursionDepthError(f"Maximum nesting depth of {max_depth} exceeded at depth {depth}.")
+            
+            if isinstance(value, dict) and hasattr(field_type, '_fields'):
+                # Lazily create NamedTuple for nested dicts
+                yield from lazily_create_namedtuple(value, field_type, depth + 1)
+            elif isinstance(value, list):
+                # Handle empty lists directly
+                if not value:
+                    yield []
+                else:
+                    # Lazily process each item in the list based on the expected item type
+                    item_type = field_type.__args__[0] if hasattr(field_type, '__args__') else None
+                    processed_items = []
+                    for v in value:
+                        if item_type:
+                            processed_items.append(next(convert(v, item_type, depth + 1)))
+                        else:
+                            processed_items.append(v)
+                    yield processed_items
+            else:
+                # Yield the value as is for simple types
+                yield value
+
+        def lazily_create_namedtuple(data: Dict, target_type: Type[NamedTuple], depth: int) -> Generator:
+            """ Lazily create NamedTuple from a dict """
+            field_values = {}
+            for field, field_type in zip(target_type._fields, target_type.__annotations__.values()):
+                if field in data:
+                    # Lazily process each field's value
+                    field_values[field] = next(convert(data[field], field_type, depth))
+                else:
+                    # If the field is missing from the JSON we assign None
+                    field_values[field] = None
+
+            namedtuple_instance = target_type(**field_values)
+            yield namedtuple_instance
+
+        namedtuple_values = next(lazily_create_namedtuple(data, target_type, 1))
+        return namedtuple_values
