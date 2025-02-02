@@ -23,7 +23,7 @@ NVME_SCHEMA = {
 
 try:
     from ..services.nvmeof_client import NVMeoFClient, empty_response, \
-        handle_nvmeof_error, map_collection, map_model, map_model2
+        handle_nvmeof_error, map_collection, map_model, map_model2, pick
 except ImportError as e:
     logger.error("Failed to import NVMeoFClient and related components: %s", e)
 else:
@@ -132,7 +132,9 @@ else:
     @APIDoc("NVMe-oF Subsystem Management API", "NVMe-oF Subsystem")
     class NVMeoFSubsystem(RESTController):
         @EndpointDoc("List all NVMeoF subsystems")
+        @pick(field="subsystems")
         @NvmeofCLICommand("nvmeof subsystem list")
+        @map_model2(model.Subsystem)
         @map_collection(model.Subsystem, pick="subsystems")
         @handle_nvmeof_error
         def list(self, gw_group: Optional[str] = None):

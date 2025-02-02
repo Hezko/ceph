@@ -245,3 +245,15 @@ else:
             return wrapper
 
         return decorator
+    
+    def pick(field:str, first: bool=False) -> Callable[..., Callable[..., object]]:
+        def decorator(func: Callable[..., Dict]) -> Callable[..., object]:
+            @functools.wraps(func)
+            def wrapper(*args, **kwargs) -> object:
+                model = func(*args, **kwargs)
+                field_to_ret = getattr(model, field)
+                if first:
+                    field_to_ret = field_to_ret[0]
+                return field_to_ret
+            return wrapper
+        return decorator
