@@ -23,7 +23,7 @@ NVME_SCHEMA = {
 
 try:
     from ..services.nvmeof_client import NVMeoFClient, empty_response, \
-        handle_nvmeof_error, map_collection, map_model
+        handle_nvmeof_error, map_collection, map_model, map_model2
 except ImportError as e:
     logger.error("Failed to import NVMeoFClient and related components: %s", e)
 else:
@@ -32,7 +32,7 @@ else:
     class NVMeoFGateway(RESTController):
         @EndpointDoc("Get information about the NVMeoF gateway")
         @NvmeofCLICommand("nvmeof gw info")
-        @map_model(model.GatewayInfo)
+        @map_model2(model.GatewayInfo)
         @handle_nvmeof_error
         def list(self, gw_group: Optional[str] = None):
             return NVMeoFClient(gw_group=gw_group).stub.get_gateway_info(
@@ -55,7 +55,7 @@ else:
         @ReadPermission
         @Endpoint('GET', '/version')
         @NvmeofCLICommand("nvmeof gw version")
-        @map_model(model.GatewayVersion)
+        @map_model2(model.GatewayVersion)
         @handle_nvmeof_error
         def version(self, gw_group: Optional[str] = None):
             gw_info = NVMeoFClient(gw_group=gw_group).stub.get_gateway_info(
@@ -68,7 +68,7 @@ else:
         @ReadPermission
         @Endpoint('GET', '/log_level')
         @NvmeofCLICommand("nvmeof gw get_log_level")
-        @map_model(model.GatewayLogLevelInfo)
+        @map_model2(model.GatewayLogLevelInfo)
         @handle_nvmeof_error
         def get_log_level(self, gw_group: Optional[str] = None):
             gw_log_level = NVMeoFClient(gw_group=gw_group).stub.get_gateway_log_level(
@@ -79,7 +79,7 @@ else:
         @ReadPermission
         @Endpoint('PUT', '/log_level')
         @NvmeofCLICommand("nvmeof gw set_log_level")
-        @map_model(model.RequestStatus)
+        @map_model2(model.RequestStatus)
         @handle_nvmeof_error
         def set_log_level(self, log_level: str, gw_group: Optional[str] = None):
             log_level = log_level.lower()

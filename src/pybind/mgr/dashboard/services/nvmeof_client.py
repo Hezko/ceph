@@ -233,3 +233,15 @@ else:
 
         namedtuple_values = next(lazily_create_namedtuple(data, target_type, 1))
         return namedtuple_values
+
+    def map_model2(model: Type[NamedTuple]) -> Callable[..., Callable[..., Model]]:
+        def decorator(func: Callable[..., Message]) -> Callable[..., Model]:
+            @functools.wraps(func)
+            def wrapper(*args, **kwargs) -> Model:
+                message = func(*args, **kwargs)
+
+                return json_to_namedtuple(model, message)._asdict()
+
+            return wrapper
+
+        return decorator
