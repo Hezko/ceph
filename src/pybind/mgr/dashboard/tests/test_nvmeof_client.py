@@ -3,6 +3,32 @@ from typing import NamedTuple, List, Dict
 from ..services.nvmeof_client import json_to_namedtuple, MaxRecursionDepthError
 
 
+class TestObjToNamedTuple:
+    # Test 1: Basic Test Case (No Nesting)
+    def test_basic(self):
+        class Person(NamedTuple):
+            name: str
+            age: int
+
+        class P:
+            def __init__(self, name, age):
+                self.name = name
+                self.age = age
+                
+            @property
+            def name():
+                return self.name
+            
+            @property
+            def age():
+                return self.age
+        
+        obj = P("Alice", 25)    
+
+        person = json_to_namedtuple(obj, Person)
+        assert person.name == "Alice"
+        assert person.age == 25
+
 class TestJsonToNamedTuple:
 
     # Test 1: Basic Test Case (No Nesting)
