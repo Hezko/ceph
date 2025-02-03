@@ -5,7 +5,8 @@ import pytest
 from mgr_module import CLICommand, HandleCommandResult
 
 from ..services.nvmeof_cli import NvmeofCLICommand
-
+from ..controllers import nvmeof as controller
+from ..model import nvmeof as model
 
 @pytest.fixture(scope="class", name="sample_command")
 def fixture_sample_command():
@@ -85,3 +86,22 @@ class TestNvmeofCLICommand:
         assert result.stdout == ''
         assert result.stderr == ''
         base_call_return_none_mock.assert_called_once()
+
+class TestGWCommands:
+    def test_gw_info(self, monkeypatch):
+        gw_info = {
+                    "cli_version": "1.2.3",
+                    "version": "2.0.0",
+                    "name": "Gateway1",
+                    "group": "GroupA",
+                    "addr": "192.168.1.1",
+                    "port": 8080,
+                    "load_balancing_group": 1,
+                    "spdk_version": "SPDKv19.11"
+                  }
+        nvmf_client_mock = MagicMock()
+        nvmf_client_mock.stub.get_gateway_info.return_value = gw_info
+        monkeypatch.setattr(controller, 'NVMeoFClient', nvmf_client_mock)
+        ret = NvmeofCLICommand.COMMANDS["nvmeof gw info"].call(None, {}, '')
+        
+        assert isinstance(ret, model.GatewayInfo)
