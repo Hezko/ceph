@@ -52,6 +52,35 @@ class TestObjToNamedTuple:
         assert person.age == 30
         assert person.address.street == "456 Oak St"
         assert person.address.city == "Springfield"
+        
+    # Test 3: Edge Case - Empty JSON
+    def test_empty_obj(self):
+        class Person(NamedTuple):
+            name: str
+            age: int
+
+        obj = MagicMock()
+
+        person = obj_to_namedtuple(obj, Person)
+        assert person.name is None
+        assert person.age is None
+
+    # Test 4: Empty List or Dictionary in JSON
+    def test_empty_list_or_dict(self):
+        class Person(NamedTuple):
+            name: str
+            hobbies: List[str]
+            address: Dict[str, str]
+
+        obj = MagicMock()
+        obj.name = "George"
+        obj.hobbies = []
+        obj.address = {}
+        
+        person = obj_to_namedtuple(obj, Person)
+        assert person.name == "George"
+        assert person.hobbies == []
+        assert person.address == {}
 
 class TestJsonToNamedTuple:
 
@@ -151,8 +180,24 @@ class TestJsonToNamedTuple:
         assert person.name == "Eva"
         assert person.age == 40
         assert person.address is None
+        
+    # Test 6: Handling redundant Fields
+    def test_redundant_fields(self):
+        class Person(NamedTuple):
+            name: str
+            age: int
 
-    # Test 6: Maximum Depth Exceeded
+        json_data = {
+            "name": "Eva",
+            "age": 40,
+            "last_name": "Cohen" 
+        }
+
+        person = obj_to_namedtuple(json_data, Person)
+        assert person.name == "Eva"
+        assert person.age == 40
+
+    # Test 7: Maximum Depth Exceeded
     def test_max_depth_exceeded(self):
         class Bla(NamedTuple):
             a: str
@@ -180,7 +225,7 @@ class TestJsonToNamedTuple:
         with pytest.raises(MaxRecursionDepthError):
             obj_to_namedtuple(json_data, Person, max_depth=2)
 
-    # Test 7: Edge Case - Empty JSON
+    # Test 8: Edge Case - Empty JSON
     def test_empty_json(self):
         class Person(NamedTuple):
             name: str
@@ -192,7 +237,7 @@ class TestJsonToNamedTuple:
         assert person.name is None
         assert person.age is None
 
-    # Test 8: Empty List or Dictionary in JSON
+    # Test 9: Empty List or Dictionary in JSON
     def test_empty_list_or_dict(self):
         class Person(NamedTuple):
             name: str
@@ -210,7 +255,7 @@ class TestJsonToNamedTuple:
         assert person.hobbies == []
         assert person.address == {}
 
-    # Optional: Test case for deeply nested object that stays within depth limit
+    # Test 10 nested object within depth limit
     def test_depth_within_limit(self):
         class Address(NamedTuple):
             street: str
@@ -232,7 +277,3 @@ class TestJsonToNamedTuple:
         assert person.name == "Helen"
         assert person.address.street == "123 Main St"
         assert person.address.city == "Metropolis"
-
-
-# test field doesn't exist in model
-# test field doesn't exist in data
