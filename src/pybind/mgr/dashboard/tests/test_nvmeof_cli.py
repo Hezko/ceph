@@ -89,7 +89,8 @@ class TestNvmeofCLICommand:
 
 class TestGWCommands:
     def test_gw_info(self, monkeypatch):
-        gw_info_mock = MagicMock()
+        from google.protobuf.message import Message
+        gw_info_mock = MagicMock(spec=Message)
         gw_info_mock.cli_version = "1.2.3"
         gw_info_mock.version = "2.0.0"
         gw_info_mock.name = "gw1"
@@ -101,18 +102,18 @@ class TestGWCommands:
         gw_info_mock.status = 0
         gw_info_mock.error_message = ''
         
-        # gw_info = {
-        #             "cli_version": "1.2.3",
-        #             "version": "2.0.0",
-        #             "name": "Gateway1",
-        #             "group": "GroupA",
-        #             "addr": "192.168.1.1",
-        #             "port": 8080,
-        #             "load_balancing_group": 1,
-        #             "spdk_version": "SPDKv19.11",
-        #             "status":0,
-        #             "error_message": ''
-        #           }
+        gw_info = {
+                    "cli_version": "1.2.3",
+                    "version": "2.0.0",
+                    "name": "Gateway1",
+                    "group": "GroupA",
+                    "addr": "192.168.1.1",
+                    "port": 8080,
+                    "load_balancing_group": 1,
+                    "spdk_version": "SPDKv19.11",
+                    "status":0,
+                    "error_message": ''
+                  }
         stub_mock = MagicMock()
         stub_mock.stub.get_gateway_info.return_value = gw_info_mock
         nvmf_client_mock = MagicMock()
@@ -120,4 +121,7 @@ class TestGWCommands:
         monkeypatch.setattr(controller, 'NVMeoFClient', nvmf_client_mock)
         ret = NvmeofCLICommand.COMMANDS["nvmeof gw info"].call(None, {}, '')
         
-        assert isinstance(ret, model.GatewayInfo)
+        assert isinstance(ret, HandleCommandResult)
+        import json
+        assert json.loads(ret.stdout) == gw_info
+        
