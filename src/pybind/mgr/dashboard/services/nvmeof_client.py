@@ -240,7 +240,7 @@ else:
             def wrapper(*args, **kwargs) -> Model:
                 message = func(*args, **kwargs)
 
-                return json_to_namedtuple(model, message)._asdict()
+                return json_to_namedtuple(message, model)._asdict()
 
             return wrapper
 
