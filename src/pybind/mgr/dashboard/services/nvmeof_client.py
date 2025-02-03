@@ -177,7 +177,7 @@ else:
         pass
 
 
-    def json_to_namedtuple(data: Any, target_type: Type[NamedTuple], max_depth: int = 4) -> NamedTuple:
+    def obj_to_namedtuple(data: Any, target_type: Type[NamedTuple], max_depth: int = 4) -> NamedTuple:
         """
         Convert an object or dict to a NamedTuple, handling nesting and lists lazily.
         This will raise an error if nesting depth exceeds the max depth (default 4) 
@@ -241,7 +241,7 @@ else:
             def wrapper(*args, **kwargs) -> Model:
                 message = func(*args, **kwargs)
 
-                return json_to_namedtuple(message, model)._asdict()
+                return obj_to_namedtuple(message, model)._asdict()
 
             return wrapper
 

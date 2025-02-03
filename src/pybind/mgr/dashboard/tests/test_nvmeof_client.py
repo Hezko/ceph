@@ -1,6 +1,6 @@
 import pytest
 from typing import NamedTuple, List, Dict
-from ..services.nvmeof_client import json_to_namedtuple, MaxRecursionDepthError
+from ..services.nvmeof_client import obj_to_namedtuple, MaxRecursionDepthError
 from unittest.mock import MagicMock
 
 
@@ -26,7 +26,7 @@ class TestObjToNamedTuple:
         
         obj = P("Alice", 25)    
 
-        person = json_to_namedtuple(obj, Person)
+        person = obj_to_namedtuple(obj, Person)
         assert person.name == "Alice"
         assert person.age == 25
         
@@ -47,7 +47,7 @@ class TestObjToNamedTuple:
         obj.address.street = "456 Oak St"
         obj.address.city = "Springfield"
 
-        person = json_to_namedtuple(obj, Person)
+        person = obj_to_namedtuple(obj, Person)
         assert person.name == "Bob"
         assert person.age == 30
         assert person.address.street == "456 Oak St"
@@ -66,7 +66,7 @@ class TestJsonToNamedTuple:
             "age": 25
         }
 
-        person = json_to_namedtuple(json_data, Person)
+        person = obj_to_namedtuple(json_data, Person)
         assert person.name == "Alice"
         assert person.age == 25
 
@@ -90,7 +90,7 @@ class TestJsonToNamedTuple:
             }
         }
 
-        person = json_to_namedtuple(json_data, Person)
+        person = obj_to_namedtuple(json_data, Person)
         assert person.name == "Bob"
         assert person.age == 30
         assert person.address.street == "456 Oak St"
@@ -107,7 +107,7 @@ class TestJsonToNamedTuple:
             "hobbies": ["reading", "cycling", "swimming"]
         }
 
-        person = json_to_namedtuple(json_data, Person)
+        person = obj_to_namedtuple(json_data, Person)
         assert person.name == "Charlie"
         assert person.hobbies == ["reading", "cycling", "swimming"]
 
@@ -129,7 +129,7 @@ class TestJsonToNamedTuple:
             ]
         }
 
-        person = json_to_namedtuple(json_data, Person)
+        person = obj_to_namedtuple(json_data, Person)
         assert person.name == "Diana"
         assert len(person.addresses) == 2
         assert person.addresses[0].street == "789 Pine St"
@@ -147,7 +147,7 @@ class TestJsonToNamedTuple:
             "age": 40
         }
 
-        person = json_to_namedtuple(json_data, Person)
+        person = obj_to_namedtuple(json_data, Person)
         assert person.name == "Eva"
         assert person.age == 40
         assert person.address is None
@@ -178,7 +178,7 @@ class TestJsonToNamedTuple:
         }
 
         with pytest.raises(MaxRecursionDepthError):
-            json_to_namedtuple(json_data, Person, max_depth=2)
+            obj_to_namedtuple(json_data, Person, max_depth=2)
 
     # Test 7: Edge Case - Empty JSON
     def test_empty_json(self):
@@ -188,7 +188,7 @@ class TestJsonToNamedTuple:
 
         json_data = {}
 
-        person = json_to_namedtuple(json_data, Person)
+        person = obj_to_namedtuple(json_data, Person)
         assert person.name is None
         assert person.age is None
 
@@ -205,7 +205,7 @@ class TestJsonToNamedTuple:
             "address": {}
         }
 
-        person = json_to_namedtuple(json_data, Person)
+        person = obj_to_namedtuple(json_data, Person)
         assert person.name == "George"
         assert person.hobbies == []
         assert person.address == {}
@@ -228,7 +228,7 @@ class TestJsonToNamedTuple:
             }
         }
 
-        person = json_to_namedtuple(json_data, Person, max_depth=4)
+        person = obj_to_namedtuple(json_data, Person, max_depth=4)
         assert person.name == "Helen"
         assert person.address.street == "123 Main St"
         assert person.address.city == "Metropolis"
