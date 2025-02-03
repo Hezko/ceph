@@ -73,19 +73,24 @@ class TestObjToNamedTuple:
             address: Dict[str, str]
 
         class P:
-            def __init__(self, name, age):
+            def __init__(self, name, hobbies, address):
                 self._name = name
-                self._age = age
+                self._hobbies = hobbies
+                self._address = address
                 
             @property
-            def hobbies(self):
+            def name():
                 return self._name
             
             @property
+            def hobbies(self):
+                return self._hobbies
+            
+            @property
             def address(self):
-                return self._age
-        
-        obj = P([], {})    
+                return self._address
+        name = "George"
+        obj = P(name, [], {})    
         
         person = obj_to_namedtuple(obj, Person)
         assert person.name == "George"
