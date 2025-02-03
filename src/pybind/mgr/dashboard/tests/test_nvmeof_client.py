@@ -12,16 +12,16 @@ class TestObjToNamedTuple:
 
         class P:
             def __init__(self, name, age):
-                self.name = name
-                self.age = age
+                self._name = name
+                self._age = age
                 
             @property
-            def name():
-                return self.name
+            def name(self):
+                return self._name
             
             @property
             def age():
-                return self.age
+                return self._age
         
         obj = P("Alice", 25)    
 
