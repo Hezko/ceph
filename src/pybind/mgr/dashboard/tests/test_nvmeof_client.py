@@ -59,7 +59,7 @@ class TestObjToNamedTuple:
             name: str
             age: int
 
-        obj = MagicMock()
+        obj = object()
 
         person = obj_to_namedtuple(obj, Person)
         assert person.name is None
@@ -72,10 +72,20 @@ class TestObjToNamedTuple:
             hobbies: List[str]
             address: Dict[str, str]
 
-        obj = MagicMock()
-        obj.name = "George"
-        obj.hobbies = []
-        obj.address = {}
+        class P:
+            def __init__(self, name, age):
+                self._name = name
+                self._age = age
+                
+            @property
+            def hobbies(self):
+                return self._name
+            
+            @property
+            def address(self):
+                return self._age
+        
+        obj = P([], {})    
         
         person = obj_to_namedtuple(obj, Person)
         assert person.name == "George"
