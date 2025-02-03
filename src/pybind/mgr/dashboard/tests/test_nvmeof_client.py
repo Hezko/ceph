@@ -79,7 +79,7 @@ class TestObjToNamedTuple:
                 self._address = address
                 
             @property
-            def name():
+            def name(self):
                 return self._name
             
             @property
