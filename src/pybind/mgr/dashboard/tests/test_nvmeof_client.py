@@ -20,7 +20,7 @@ class TestObjToNamedTuple:
                 return self._name
             
             @property
-            def age():
+            def age(self):
                 return self._age
         
         obj = P("Alice", 25)    
