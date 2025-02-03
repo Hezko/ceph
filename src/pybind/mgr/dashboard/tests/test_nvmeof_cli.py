@@ -89,23 +89,34 @@ class TestNvmeofCLICommand:
 
 class TestGWCommands:
     def test_gw_info(self, monkeypatch):
-        gw_info = {
-                    "cli_version": "1.2.3",
-                    "version": "2.0.0",
-                    "name": "Gateway1",
-                    "group": "GroupA",
-                    "addr": "192.168.1.1",
-                    "port": 8080,
-                    "load_balancing_group": 1,
-                    "spdk_version": "SPDKv19.11",
-                    "status":0,
-                    "error_message": ''
-                  }
+        gw_info_mock = MagicMock()
+        gw_info_mock.cli_version = "1.2.3"
+        gw_info_mock.version = "2.0.0"
+        gw_info_mock.name = "gw1"
+        gw_info_mock.group = "ga"
+        gw_info_mock.addr = "192.168.1.1"
+        gw_info_mock.port = 8080
+        gw_info_mock.load_balancing_group = 1
+        gw_info_mock.spdk_version = '11.1'
+        gw_info_mock.status = 0
+        gw_info_mock.error_message = ''
+        
+        # gw_info = {
+        #             "cli_version": "1.2.3",
+        #             "version": "2.0.0",
+        #             "name": "Gateway1",
+        #             "group": "GroupA",
+        #             "addr": "192.168.1.1",
+        #             "port": 8080,
+        #             "load_balancing_group": 1,
+        #             "spdk_version": "SPDKv19.11",
+        #             "status":0,
+        #             "error_message": ''
+        #           }
         stub_mock = MagicMock()
-        stub_mock.stub.get_gateway_info.return_value = gw_info
+        stub_mock.stub.get_gateway_info.return_value = gw_info_mock
         nvmf_client_mock = MagicMock()
         nvmf_client_mock.return_value = stub_mock
-        nvmf_client_mock.stub.get_gateway_info.return_value = gw_info
         monkeypatch.setattr(controller, 'NVMeoFClient', nvmf_client_mock)
         ret = NvmeofCLICommand.COMMANDS["nvmeof gw info"].call(None, {}, '')
         
