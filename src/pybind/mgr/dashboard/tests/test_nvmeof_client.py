@@ -1,6 +1,7 @@
 import pytest
 from typing import NamedTuple, List, Dict
 from ..services.nvmeof_client import json_to_namedtuple, MaxRecursionDepthError
+from unittest.mock import MagicMock
 
 
 class TestObjToNamedTuple:
@@ -28,6 +29,29 @@ class TestObjToNamedTuple:
         person = json_to_namedtuple(obj, Person)
         assert person.name == "Alice"
         assert person.age == 25
+        
+    # Test 2: Nested NamedTuple
+    def test_nested(self):
+        class Address(NamedTuple):
+            street: str
+            city: str
+        
+        class Person(NamedTuple):
+            name: str
+            age: int
+            address: Address
+
+        obj = MagicMock()
+        obj.name = "Bob"
+        obj.age = 30
+        obj.address.street = "456 Oak St"
+        obj.address.city = "Springfield"
+
+        person = json_to_namedtuple(obj, Person)
+        assert person.name == "Bob"
+        assert person.age == 30
+        assert person.address.street == "456 Oak St"
+        assert person.address.city == "Springfield"
 
 class TestJsonToNamedTuple:
 
@@ -208,3 +232,7 @@ class TestJsonToNamedTuple:
         assert person.name == "Helen"
         assert person.address.street == "123 Main St"
         assert person.address.city == "Metropolis"
+
+
+# test field doesn't exist in model
+# test field doesn't exist in data
