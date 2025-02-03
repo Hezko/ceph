@@ -99,7 +99,10 @@ class TestGWCommands:
                     "load_balancing_group": 1,
                     "spdk_version": "SPDKv19.11"
                   }
+        stub_mock = MagicMock()
+        stub_mock.stub.get_gateway_info.return_value = gw_info
         nvmf_client_mock = MagicMock()
+        nvmf_client_mock.return_value = stub_mock
         nvmf_client_mock.stub.get_gateway_info.return_value = gw_info
         monkeypatch.setattr(controller, 'NVMeoFClient', nvmf_client_mock)
         ret = NvmeofCLICommand.COMMANDS["nvmeof gw info"].call(None, {}, '')
