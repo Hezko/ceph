@@ -222,9 +222,11 @@ else:
             field_values = {}
             for field, field_type in zip(target_type._fields, target_type.__annotations__.values()):
                 # this condition is complex since we need to navigate between dicts, empty dicts and objects
-                if hasattr(data, field) or data.get(field) is not None: 
+                if hasattr(data, field): 
                     # Lazily process each field's value
-                    field_values[field] = next(convert(getattr(data, field, None) or data.get(field), field_type, depth))
+                    field_values[field] = next(convert(getattr(data, field), field_type, depth))
+                elif isinstance(data, dict) and data.get(field) is not None:
+                    field_values[field] = next(convert(data.get(field), field_type, depth))
                 else:
                     # If the field is missing from the JSON we assign None
                     field_values[field] = None
