@@ -176,6 +176,50 @@ else:
     class MaxRecursionDepthError(Exception):
         pass
 
+    def _convert(value, field_type, depth, max_depth) -> Generator:
+            if depth > max_depth:
+                raise MaxRecursionDepthError(f"Maximum nesting depth of {max_depth} exceeded at depth {depth}.")
+            
+            if isinstance(value, dict) and hasattr(field_type, '_fields'):
+                # Lazily create NamedTuple for nested dicts
+                yield from _lazily_create_namedtuple(value, field_type, depth + 1, max_depth)
+            elif isinstance(value, list):
+                # Handle empty lists directly
+                if not value:
+                    yield []
+                else:
+                    # Lazily process each item in the list based on the expected item type
+                    item_type = field_type.__args__[0] if hasattr(field_type, '__args__') else None
+                    processed_items = []
+                    for v in value:
+                        if item_type:
+                            processed_items.append(next(_convert(v, item_type, depth + 1, max_depth)))
+                        else:
+                            processed_items.append(v)
+                    yield processed_items
+            else:
+                # Yield the value as is for simple types
+                yield value
+
+
+    def _lazily_create_namedtuple(data: Any, target_type: Type[NamedTuple], depth: int, max_depth: int) -> Generator:
+            """ Lazily create NamedTuple from a dict """
+            field_values = {}
+            for field, field_type in zip(target_type._fields, target_type.__annotations__.values()):
+                # this condition is complex since we need to navigate between dicts, empty dicts and objects
+                
+                if isinstance(data, dict) and data.get(field) is not None:
+                    field_values[field] = next(_convert(data.get(field), field_type, depth, max_depth))
+                elif hasattr(data, field): 
+                    # Lazily process each field's value
+                    field_values[field] = next(_convert(getattr(data, field), field_type, depth, max_depth))
+                else:
+                    # If the field is missing assign None
+                    field_values[field] = None
+
+            namedtuple_instance = target_type(**field_values)
+            yield namedtuple_instance
+
 
     def obj_to_namedtuple(data: Any, target_type: Type[NamedTuple], max_depth: int = 4) -> NamedTuple:
         """
@@ -190,52 +234,9 @@ else:
         """
 
         if not isinstance(target_type, type) or not hasattr(target_type, '_fields'):
-            raise TypeError("target_type must be a NamedTuple type.")
+            raise TypeError("target_type must be a NamedTuple type.")        
 
-        def convert(value, field_type, depth) -> Generator:
-            if depth > max_depth:
-                raise MaxRecursionDepthError(f"Maximum nesting depth of {max_depth} exceeded at depth {depth}.")
-            
-            if isinstance(value, dict) and hasattr(field_type, '_fields'):
-                # Lazily create NamedTuple for nested dicts
-                yield from lazily_create_namedtuple(value, field_type, depth + 1)
-            elif isinstance(value, list):
-                # Handle empty lists directly
-                if not value:
-                    yield []
-                else:
-                    # Lazily process each item in the list based on the expected item type
-                    item_type = field_type.__args__[0] if hasattr(field_type, '__args__') else None
-                    processed_items = []
-                    for v in value:
-                        if item_type:
-                            processed_items.append(next(convert(v, item_type, depth + 1)))
-                        else:
-                            processed_items.append(v)
-                    yield processed_items
-            else:
-                # Yield the value as is for simple types
-                yield value
-
-        def lazily_create_namedtuple(data: Any, target_type: Type[NamedTuple], depth: int) -> Generator:
-            """ Lazily create NamedTuple from a dict """
-            field_values = {}
-            for field, field_type in zip(target_type._fields, target_type.__annotations__.values()):
-                # this condition is complex since we need to navigate between dicts, empty dicts and objects
-                
-                if isinstance(data, dict) and data.get(field) is not None:
-                    field_values[field] = next(convert(data.get(field), field_type, depth))
-                elif hasattr(data, field): 
-                    # Lazily process each field's value
-                    field_values[field] = next(convert(getattr(data, field), field_type, depth))
-                else:
-                    # If the field is missing assign None
-                    field_values[field] = None
-
-            namedtuple_instance = target_type(**field_values)
-            yield namedtuple_instance
-
-        namedtuple_values = next(lazily_create_namedtuple(data, target_type, 1))
+        namedtuple_values = next(_lazily_create_namedtuple(data, target_type, 1, max_depth))
         return namedtuple_values
 
     def map_model2(model: Type[NamedTuple]) -> Callable[..., Callable[..., Model]]:
