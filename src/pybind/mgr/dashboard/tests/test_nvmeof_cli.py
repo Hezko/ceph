@@ -97,7 +97,9 @@ class TestGWCommands:
                     "addr": "192.168.1.1",
                     "port": 8080,
                     "load_balancing_group": 1,
-                    "spdk_version": "SPDKv19.11"
+                    "spdk_version": "SPDKv19.11",
+                    "status":0,
+                    "error_message": ''
                   }
         stub_mock = MagicMock()
         stub_mock.stub.get_gateway_info.return_value = gw_info
