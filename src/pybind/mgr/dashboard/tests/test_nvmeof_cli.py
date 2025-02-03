@@ -93,12 +93,12 @@ class TestGWCommands:
         gw_info_mock = MagicMock(spec=Message)
         gw_info_mock.cli_version = "1.2.3"
         gw_info_mock.version = "2.0.0"
-        gw_info_mock.name = "gw1"
-        gw_info_mock.group = "ga"
+        gw_info_mock.name = "Gateway1"
+        gw_info_mock.group = "GroupA"
         gw_info_mock.addr = "192.168.1.1"
         gw_info_mock.port = 8080
         gw_info_mock.load_balancing_group = 1
-        gw_info_mock.spdk_version = '11.1'
+        gw_info_mock.spdk_version = "SPDKv19.11"
         gw_info_mock.status = 0
         gw_info_mock.error_message = ''
         
