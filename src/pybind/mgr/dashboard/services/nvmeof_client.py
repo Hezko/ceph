@@ -177,13 +177,13 @@ else:
         pass
 
 
-    def json_to_namedtuple(data: Dict, target_type: Type[NamedTuple], max_depth: int = 4) -> NamedTuple:
+    def json_to_namedtuple(data: Any, target_type: Type[NamedTuple], max_depth: int = 4) -> NamedTuple:
         """
-        Convert a JSON object to a NamedTuple, handling nesting and lists lazily.
+        Convert an object or dict to a NamedTuple, handling nesting and lists lazily.
         This will raise an error if nesting depth exceeds the max depth (default 4) 
         to avoid bloating the memory in case of mutual references between objects.
 
-        :param data: The input JSON as a Python dictionary
+        :param data: The input data - object or dictionary
         :param target_type: The target NamedTuple type
         :param max_depth: The maximum depth allowed for recursion
         :return: An instance of the target NamedTuple with fields populated from the JSON
@@ -217,7 +217,7 @@ else:
                 # Yield the value as is for simple types
                 yield value
 
-        def lazily_create_namedtuple(data: Dict, target_type: Type[NamedTuple], depth: int) -> Generator:
+        def lazily_create_namedtuple(data: Any, target_type: Type[NamedTuple], depth: int) -> Generator:
             """ Lazily create NamedTuple from a dict """
             field_values = {}
             for field, field_type in zip(target_type._fields, target_type.__annotations__.values()):
