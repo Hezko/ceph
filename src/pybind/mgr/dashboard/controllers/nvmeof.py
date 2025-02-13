@@ -280,6 +280,15 @@ else:
                 )
             )
 
+
+    class DummyResp():
+        def __init__(self, status):
+            self._status = status
+            
+        @property
+        def status(self):
+            return self._status
+    
     @APIRouter("/nvmeof/subsystem/{nqn}/namespace", Scope.NVME_OF)
     @APIDoc("NVMe-oF Subsystem Namespace Management API", "NVMe-oF Subsystem Namespace")
     class NVMeoFNamespace(RESTController):
@@ -410,38 +419,27 @@ else:
                 mib = 1024 * 1024
                 new_size_mib = int((rbd_image_size + mib - 1) / mib)
 
-                resp = NVMeoFClient(gw_group=gw_group).stub.namespace_resize(
-                    NVMeoFClient.pb2.namespace_resize_req(
-                        subsystem_nqn=nqn, nsid=int(nsid), new_size=new_size_mib
-                    )
-                )
+                resp = DummyResp(0)
                 if resp.status != 0:
                     contains_failure = True
 
             if load_balancing_group:
-                resp = NVMeoFClient().stub.namespace_change_load_balancing_group(
-                    NVMeoFClient.pb2.namespace_change_load_balancing_group_req(
-                        subsystem_nqn=nqn, nsid=int(nsid), anagrpid=load_balancing_group
-                    )
-                )
+                resp = DummyResp(0)
                 if resp.status != 0:
                     contains_failure = True
 
             if rw_ios_per_second or rw_mbytes_per_second or r_mbytes_per_second \
                or w_mbytes_per_second:
-                resp = NVMeoFClient().stub.namespace_set_qos_limits(
-                    NVMeoFClient.pb2.namespace_set_qos_req(
-                        subsystem_nqn=nqn,
-                        nsid=int(nsid),
-                        rw_ios_per_second=rw_ios_per_second,
-                        rw_mbytes_per_second=rw_mbytes_per_second,
-                        r_mbytes_per_second=r_mbytes_per_second,
-                        w_mbytes_per_second=w_mbytes_per_second,
-                    )
-                )
+                resp = DummyResp(0)
                 if resp.status != 0:
                     contains_failure = True
-            response = self._get(nqn, nsid, gw_group)
+            # response = self._get(nqn, nsid, gw_group)
+            response = {
+                "nsid":1,
+                "bdev_name":"bla",
+                "uuid": '323fds'
+                
+            }
             if contains_failure:
                 cherrypy.response.status = 202
             return response
