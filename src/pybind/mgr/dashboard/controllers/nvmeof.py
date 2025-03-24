@@ -14,6 +14,7 @@ from ..tools import str_to_bool
 from . import APIDoc, APIRouter, BaseController, CreatePermission, \
     DeletePermission, Endpoint, EndpointDoc, Param, ReadPermission, \
     RESTController, UIRouter
+from google.protobuf import json_format
 
 logger = logging.getLogger(__name__)
 
@@ -142,6 +143,125 @@ else:
                 NVMeoFClient.pb2.list_subsystems_req()
             )
 
+
+        @EndpointDoc("List all NVMeoF subsystems1")
+        @pick(field="subsystems", first=True)
+        @NvmeofCLICommand("nvmeof subsystem list1")
+        @convert_to_model(model.SubsystemList)
+        @handle_nvmeof_error
+        def list1(self, gw_group: Optional[str] = None):
+            resp = NVMeoFClient(gw_group=gw_group).stub.list_subsystems(
+                NVMeoFClient.pb2.list_subsystems_req()
+            )
+            json_msg = json_format.MessageToJson(resp, indent=4,
+                                                including_default_value_fields=True,
+                                                preserving_proto_field_name=True)
+            raise Exception(json_msg)
+            return resp 
+        
+        @EndpointDoc("List all NVMeoF subsystems2")
+        @pick(field="subsystems", first=True)
+        @NvmeofCLICommand("nvmeof subsystem list2")
+        @convert_to_model(model.SubsystemList)
+        @handle_nvmeof_error
+        def list2(self, gw_group: Optional[str] = None):
+            resp = NVMeoFClient(gw_group=gw_group).stub.list_subsystems(
+                NVMeoFClient.pb2.list_subsystems_req()
+            )
+            json_msg = json_format.MessageToDict(resp, indent=4,
+                                                including_default_value_fields=True,
+                                                preserving_proto_field_name=True)
+            raise Exception(json_msg)
+            return resp 
+
+        @EndpointDoc("List all NVMeoF subsystems3")
+        @pick(field="subsystems", first=True)
+        @NvmeofCLICommand("nvmeof subsystem list3")
+        @convert_to_model(model.SubsystemList)
+        @handle_nvmeof_error
+        def list3(self, gw_group: Optional[str] = None):
+            msg = {
+                "status": 0,
+                "error_message": "Success",
+                "subsystems": [
+                    [
+                    "nqn.2016-06.io.spdk:cnode1.mygroup1",
+                    True,
+                    "Ceph26998066244430",
+                    "Ceph bdev Controller",
+                    1,
+                    2040,
+                    4,
+                    "NVMe",
+                    1024
+                    ],
+                    [
+                    "nqn.2016-06.io.spdk:cnode2.mygroup1",
+                    True,
+                    "Ceph7692796757816",
+                    "Ceph bdev Controller",
+                    1,
+                    2040,
+                    4,
+                    "NVMe",
+                    1024
+                    ]
+                ]
+            }
+            from .proto import gateway_pb2 as pb2  # type: ignore
+            msg_obj = json_format.ParseDict(msg, pb2.subsystems_info_cli())
+            json_msg = json_format.MessageToDict(msg_obj, indent=4,
+                                                including_default_value_fields=True,
+                                                preserving_proto_field_name=True)
+            raise Exception(json_msg)
+            return resp 
+        
+        @EndpointDoc("List all NVMeoF subsystems4")
+        @pick(field="subsystems", first=True)
+        @NvmeofCLICommand("nvmeof subsystem list4")
+        @convert_to_model(model.SubsystemList)
+        @handle_nvmeof_error
+        def list4(self, gw_group: Optional[str] = None):
+            msg = {
+                "error_message": "Success",
+                "subsystems": [
+                    {
+                        "nqn": "nqn.2016-06.io.spdk:cnode1.mygroup1",
+                        "enable_ha": true,
+                        "serial_number": "Ceph26998066244430",
+                        "model_number": "Ceph bdev Controller",
+                        "min_cntlid": 1,
+                        "max_cntlid": 2040,
+                        "namespace_count": 4,
+                        "subtype": "NVMe",
+                        "max_namespaces": 1024,
+                        "has_dhchap_key": false,
+                        "allow_any_host": true
+                    },
+                    {
+                        "nqn": "nqn.2016-06.io.spdk:cnode2.mygroup1",
+                        "enable_ha": true,
+                        "serial_number": "Ceph7692796757816",
+                        "model_number": "Ceph bdev Controller",
+                        "min_cntlid": 1,
+                        "max_cntlid": 2040,
+                        "namespace_count": 4,
+                        "subtype": "NVMe",
+                        "max_namespaces": 1024,
+                        "has_dhchap_key": false,
+                        "allow_any_host": true
+                    }
+                ],
+                "status": 0
+            }
+            from .proto import gateway_pb2 as pb2  # type: ignore
+            msg_obj = json_format.ParseDict(msg, pb2.subsystems_info_cli())
+            json_msg = json_format.MessageToDict(msg_obj, indent=4,
+                                                including_default_value_fields=True,
+                                                preserving_proto_field_name=True)
+            raise Exception(json_msg)
+            return resp 
+                
         @EndpointDoc(
             "Get information from a specific NVMeoF subsystem",
             parameters={
