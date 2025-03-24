@@ -168,9 +168,9 @@ else:
             resp = NVMeoFClient(gw_group=gw_group).stub.list_subsystems(
                 NVMeoFClient.pb2.list_subsystems_req()
             )
-            json_msg = json_format.MessageToDict(resp, indent=4,
-                                                including_default_value_fields=True,
-                                                preserving_proto_field_name=True)
+            json_msg = json_format.MessageToDict(resp,
+                                            including_default_value_fields=True,
+                                            preserving_proto_field_name=True)
             raise Exception(json_msg)
             return resp 
 
@@ -208,9 +208,9 @@ else:
                     ]
                 ]
             }
-            from .proto import gateway_pb2 as pb2  # type: ignore
+            from ..services.proto import gateway_pb2 as pb2  # type: ignore
             msg_obj = json_format.ParseDict(msg, pb2.subsystems_info_cli())
-            json_msg = json_format.MessageToDict(msg_obj, indent=4,
+            json_msg = json_format.MessageToDict(msg_obj,
                                                 including_default_value_fields=True,
                                                 preserving_proto_field_name=True)
             raise Exception(json_msg)
@@ -227,7 +227,7 @@ else:
                 "subsystems": [
                     {
                         "nqn": "nqn.2016-06.io.spdk:cnode1.mygroup1",
-                        "enable_ha": true,
+                        "enable_ha": True,
                         "serial_number": "Ceph26998066244430",
                         "model_number": "Ceph bdev Controller",
                         "min_cntlid": 1,
@@ -235,12 +235,12 @@ else:
                         "namespace_count": 4,
                         "subtype": "NVMe",
                         "max_namespaces": 1024,
-                        "has_dhchap_key": false,
-                        "allow_any_host": true
+                        "has_dhchap_key": False,
+                        "allow_any_host": True
                     },
                     {
                         "nqn": "nqn.2016-06.io.spdk:cnode2.mygroup1",
-                        "enable_ha": true,
+                        "enable_ha": True,
                         "serial_number": "Ceph7692796757816",
                         "model_number": "Ceph bdev Controller",
                         "min_cntlid": 1,
@@ -248,15 +248,15 @@ else:
                         "namespace_count": 4,
                         "subtype": "NVMe",
                         "max_namespaces": 1024,
-                        "has_dhchap_key": false,
-                        "allow_any_host": true
+                        "has_dhchap_key": False,
+                        "allow_any_host": True
                     }
                 ],
                 "status": 0
             }
-            from .proto import gateway_pb2 as pb2  # type: ignore
+            from ..services.proto import gateway_pb2 as pb2  # type: ignore
             msg_obj = json_format.ParseDict(msg, pb2.subsystems_info_cli())
-            json_msg = json_format.MessageToDict(msg_obj, indent=4,
+            json_msg = json_format.MessageToDict(msg_obj,
                                                 including_default_value_fields=True,
                                                 preserving_proto_field_name=True)
             raise Exception(json_msg)
