@@ -129,7 +129,10 @@ class TestObjToNamedTuple:
                 ],
                 "status": 0
             }
-        out = obj_to_namedtuple(msg, model.SubsystemList)
+        from google.protobuf import json_format
+        from ..services.proto import gateway_pb2 as pb2  # type: ignore
+        msg_obj = json_format.ParseDict(msg, pb2.subsystems_info_cli())
+        out = obj_to_namedtuple(msg_obj, model.SubsystemList)
         import json
         
         assert json.loads(out) == ''
