@@ -177,6 +177,8 @@ else:
         pass
 
     def _convert(value, field_type, depth, max_depth) -> Generator:
+        import json
+        print(str(field_type) + ' : ' + json.dumps(value))
         if depth > max_depth:
             raise MaxRecursionDepthError(
                 f"Maximum nesting depth of {max_depth} exceeded at depth {depth}.")
