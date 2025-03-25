@@ -372,7 +372,7 @@ def fixture_empty_func():
 
 @pytest.fixture(name="disable_message_to_dict")
 def fixture_disable_message_to_dict(monkeypatch):
-    monkeypatch.setattr(nvmeof_client, 'MessageToDict', lambda x: x)
+    monkeypatch.setattr(nvmeof_client, 'MessageToDict',lambda x, **kwargs: x)
     
 class TestConvertToModel:
     def test_basic_functionality(self, person_func, disable_message_to_dict):
