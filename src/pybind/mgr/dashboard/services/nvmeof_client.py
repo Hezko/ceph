@@ -231,7 +231,7 @@ else:
 
         namedtuple_instance = target_type(**field_values)  # type: ignore
         import json
-        print(str(target_type) + ' : ' + json.dumps(data._asdict()))
+        print(str(target_type) + ' : ' + json.dumps(namedtuple_instance._asdict())
         yield namedtuple_instance
 
     def obj_to_namedtuple(data: Any, target_type: Type[NamedTuple],
