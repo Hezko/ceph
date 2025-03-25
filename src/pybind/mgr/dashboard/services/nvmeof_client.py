@@ -210,6 +210,9 @@ else:
 
     def _lazily_create_namedtuple(data: Any, target_type: Type[NamedTuple],
                                   depth: int, max_depth: int) -> Generator:
+        p = False
+        if data.get('nqn') == "nqn.2016-06.io.spdk:cnode1.mygroup1":
+            p = True
         """ Lazily create NamedTuple from a dict """
         field_values = {}
         for field, field_type in zip(target_type._fields,
@@ -231,7 +234,8 @@ else:
             else:
                 # If the field is missing assign None
                 field_values[field] = None
-
+        if p: 
+            print(f'{target_type=}')
         namedtuple_instance = target_type(**field_values)  # type: ignore
         import json
         print(str(target_type) + ' : ' + json.dumps(namedtuple_instance._asdict()))
