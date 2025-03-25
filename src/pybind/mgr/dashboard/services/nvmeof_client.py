@@ -265,13 +265,23 @@ else:
         namedtuple_values = next(_lazily_create_namedtuple(data, target_type, 1, max_depth))
         return namedtuple_values
 
+    def namedtuple_to_dict(obj):
+        if isinstance(obj, tuple) and hasattr(obj, '_asdict'):
+            # If it's a namedtuple, convert it to a dictionary
+            return {k: namedtuple_to_dict(v) for k, v in obj._asdict().items()}
+        elif isinstance(obj, list):
+            # If it's a list, check each item and convert if it's a namedtuple
+            return [namedtuple_to_dict(item) if isinstance(item, tuple) and hasattr(item, '_asdict') else item for item in obj]
+        return obj
+
     def convert_to_model(model: Type[NamedTuple]) -> Callable[..., Callable[..., Model]]:
         def decorator(func: Callable[..., Message]) -> Callable[..., Model]:
             @functools.wraps(func)
             def wrapper(*args, **kwargs) -> Model:
                 message = func(*args, **kwargs)
                 msg_dict = MessageToDict(message, including_default_value_fields=True, preserving_proto_field_name=True)
-                return obj_to_namedtuple(msg_dict, model)._asdict()
+                
+                return namedtuple_to_dict(obj_to_namedtuple(msg_dict, model))
 
             return wrapper
 
