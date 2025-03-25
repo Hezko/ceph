@@ -221,13 +221,13 @@ else:
                     field_values[field] = next(_convert(data.get(field), field_type,
                                                         depth, max_depth), None)
                 except StopIteration:
-                    return
+                    continue
             elif hasattr(data, field):
                 try:
                     field_values[field] = next(_convert(getattr(data, field), field_type,
                                                         depth, max_depth), None)
                 except StopIteration:
-                    return
+                    continue
             else:
                 # If the field is missing assign None
                 field_values[field] = None
