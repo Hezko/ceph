@@ -135,7 +135,7 @@ class TestObjToNamedTuple:
         out = obj_to_namedtuple(msg_obj, model.SubsystemList)
         import json
         
-        assert json.loads(out) == ''
+        assert json.dumps(out) == ''
 
 
 class TestJsonToNamedTuple:
