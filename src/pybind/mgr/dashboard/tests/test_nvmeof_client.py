@@ -136,11 +136,14 @@ class TestObjToNamedTuple:
         print(out.subsystems)
         
         def namedtuple_to_dict(obj):
-            if hasattr(obj, '_asdict'):
-                # Convert namedtuple to dictionary
+            if isinstance(obj, tuple) and hasattr(obj, '_asdict'):
+                # If it's a namedtuple, convert it to a dictionary
                 return {k: namedtuple_to_dict(v) for k, v in obj._asdict().items()}
+            elif isinstance(obj, list):
+                # If it's a list, check each item and convert if it's a namedtuple
+                return [namedtuple_to_dict(item) if isinstance(item, tuple) and hasattr(item, '_asdict') else item for item in obj]
             return obj
-        
+                
         dict_out = namedtuple_to_dict(out)
         
         import json
