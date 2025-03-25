@@ -134,8 +134,17 @@ class TestObjToNamedTuple:
         # msg_obj = json_format.ParseDict(msg, pb2.subsystems_info_cli())
         out = obj_to_namedtuple(msg, model.SubsystemList)
         print(out.subsystems)
-        import json
         
+        def namedtuple_to_dict(obj):
+            if isinstance(obj, tuple) and hasattr(obj, '_asdict'):
+                # Convert namedtuple to dictionary
+                return {k: namedtuple_to_dict(v) for k, v in obj._asdict().items()}
+            return obj
+        
+        dict_out = namedtuple_to_dict(out)
+        
+        import json
+        print(json.dumps(dict_out))
         assert json.dumps(out._asdict()) == ''
 
 
