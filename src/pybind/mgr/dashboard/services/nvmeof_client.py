@@ -185,7 +185,8 @@ else:
 
         if isinstance(value, dict) and hasattr(field_type, '_fields'):
             # Lazily create NamedTuple for nested dicts
-            yield from _lazily_create_namedtuple(value, field_type, depth + 1, max_depth)
+            yield _lazily_create_namedtuple(value, field_type, depth + 1, max_depth)
+            # yield from _lazily_create_namedtuple(value, field_type, depth + 1, max_depth)
         elif isinstance(value, list):
             # Handle empty lists directly
             if not value:
