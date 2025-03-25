@@ -177,8 +177,8 @@ else:
         pass
 
     def _convert(value, field_type, depth, max_depth) -> Generator:
-        import json
-        print(str(field_type) + ' : ' + json.dumps(value))
+        # import json
+        # print(str(field_type) + ' : ' + json.dumps(value))
         if depth > max_depth:
             raise MaxRecursionDepthError(
                 f"Maximum nesting depth of {max_depth} exceeded at depth {depth}.")
@@ -230,6 +230,8 @@ else:
                 field_values[field] = None
 
         namedtuple_instance = target_type(**field_values)  # type: ignore
+        import json
+        print(str(target_type) + ' : ' + json.dumps(data))
         yield namedtuple_instance
 
     def obj_to_namedtuple(data: Any, target_type: Type[NamedTuple],
