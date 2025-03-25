@@ -2,7 +2,7 @@ from typing import Dict, List, NamedTuple, Optional
 from unittest.mock import MagicMock
 
 import pytest
-
+from ..model import nvmeof as model
 from ..services.nvmeof_client import MaxRecursionDepthError, convert_to_model, \
     obj_to_namedtuple, pick
 
@@ -95,6 +95,44 @@ class TestObjToNamedTuple:
         assert person.name == "George"
         assert person.hobbies == []
         assert person.address == {}
+        
+    def test_subsystem_list_msg(self, ):
+        msg = {
+                "error_message": "Success",
+                "subsystems": [
+                    {
+                        "nqn": "nqn.2016-06.io.spdk:cnode1.mygroup1",
+                        "enable_ha": True,
+                        "serial_number": "Ceph26998066244430",
+                        "model_number": "Ceph bdev Controller",
+                        "min_cntlid": 1,
+                        "max_cntlid": 2040,
+                        "namespace_count": 4,
+                        "subtype": "NVMe",
+                        "max_namespaces": 1024,
+                        "has_dhchap_key": False,
+                        "allow_any_host": True
+                    },
+                    {
+                        "nqn": "nqn.2016-06.io.spdk:cnode2.mygroup1",
+                        "enable_ha": True,
+                        "serial_number": "Ceph7692796757816",
+                        "model_number": "Ceph bdev Controller",
+                        "min_cntlid": 1,
+                        "max_cntlid": 2040,
+                        "namespace_count": 4,
+                        "subtype": "NVMe",
+                        "max_namespaces": 1024,
+                        "has_dhchap_key": False,
+                        "allow_any_host": True
+                    }
+                ],
+                "status": 0
+            }
+        out = obj_to_namedtuple(msg, model.SubsystemList)
+        import json
+        
+        assert json.loads(out) == ''
 
 
 class TestJsonToNamedTuple:
@@ -370,6 +408,7 @@ class TestConvertToModel:
     def test_empty_model(self, empty_func):
         result = empty_func()
         assert result == {}
+        
 
 
 class TestPick:
