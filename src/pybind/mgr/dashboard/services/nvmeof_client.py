@@ -235,7 +235,8 @@ else:
                 # If the field is missing assign None
                 field_values[field] = None
         if p: 
-            print(f'{target_type=}')
+            import json
+            print(f'{target_type=} ===== \r\n {json.dumps(field_values)}')
         namedtuple_instance = target_type(**field_values)  # type: ignore
         import json
         print(str(target_type) + ' : ' + json.dumps(namedtuple_instance._asdict()))
