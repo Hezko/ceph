@@ -3,6 +3,7 @@ from unittest.mock import MagicMock
 
 import pytest
 from ..model import nvmeof as model
+from ..services import nvmeof_client
 from ..services.nvmeof_client import MaxRecursionDepthError, convert_to_model, \
     obj_to_namedtuple, pick
 
@@ -369,13 +370,16 @@ def fixture_empty_func():
         return {}
     return get_empty_data
 
-
+@pytest.fixture(name="disable_message_to_dict")
+def fixture_disable_message_to_dict(monkeypatch):
+    monkeypatch.setattr(nvmeof_client, 'MessageToDict', lambda x: x)
+    
 class TestConvertToModel:
-    def test_basic_functionality(self, person_func):
+    def test_basic_functionality(self, person_func, disable_message_to_dict):
         result = person_func()
         assert result == {'name': 'Alice', 'age': 30}
 
-    def test_empty_output(self):
+    def test_empty_output(self, disable_message_to_dict):
         @convert_to_model(Boy)
         def get_empty_person() -> dict:
             return {}
@@ -383,7 +387,7 @@ class TestConvertToModel:
         result = get_empty_person()
         assert result == {'name': None, 'age': None}  # Assuming default values for empty fields
 
-    def test_non_dict_return_value(self):
+    def test_non_dict_return_value(self, disable_message_to_dict):
         @convert_to_model(Boy)
         def get_person_list() -> list:
             return ["Alice", 30]  # This is an invalid return type
@@ -391,7 +395,7 @@ class TestConvertToModel:
         with pytest.raises(TypeError):
             get_person_list()
 
-    def test_optional_fields(self):
+    def test_optional_fields(self, disable_message_to_dict):
         @convert_to_model(Adult)
         def get_adult() -> dict:
             return {"name": "Charlie", "age": 40, "children": []}
@@ -399,7 +403,7 @@ class TestConvertToModel:
         result = get_adult()
         assert result == {'name': 'Charlie', 'age': 40, "children": [], 'hobby': None}
 
-    def test_nested_fields(self):
+    def test_nested_fields(self, disable_message_to_dict):
         @convert_to_model(Adult)
         def get_adult() -> dict:
             return {"name": "Charlie", "age": 40, "children": [{"name": "Alice", "age": 30}]}
@@ -408,7 +412,7 @@ class TestConvertToModel:
         assert result == {'name': 'Charlie', 'age': 40,
                           "children": [{"name": "Alice", "age": 30}], 'hobby': None}
 
-    def test_none_as_input(self):
+    def test_none_as_input(self, disable_message_to_dict):
         @convert_to_model(Boy)
         def get_none_person() -> dict:
             return None
@@ -416,12 +420,12 @@ class TestConvertToModel:
         with pytest.raises(TypeError):
             get_none_person()
 
-    def test_multiple_function_calls(self, person_func):
+    def test_multiple_function_calls(self, person_func, disable_message_to_dict):
         result1 = person_func()
         result2 = person_func()
         assert result1 == result2
 
-    def test_empty_model(self, empty_func):
+    def test_empty_model(self, empty_func, disable_message_to_dict):
         result = empty_func()
         assert result == {}
         
