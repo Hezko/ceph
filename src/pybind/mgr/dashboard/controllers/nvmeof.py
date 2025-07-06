@@ -188,11 +188,14 @@ else:
         @NvmeofCLICommand("nvmeof subsystem add", model.RequestStatus)
         @convert_to_model(model.SubsystemStatus)
         @handle_nvmeof_error
-        def create(self, nqn: str, enable_ha: bool = True, max_namespaces: int = 1024,
-                   gw_group: Optional[str] = None, traddr: Optional[str] = None):
+        def create(self, nqn: str, enable_ha: Optional[bool] = True, max_namespaces: Optional[int] = 1024,
+                   no_group_append: Optional[bool] = True, serial_number: Optional[str] = None,
+                   dhchap_key: Optional[str] = None, gw_group: Optional[str] = None,
+                   traddr: Optional[str] = None):
             return NVMeoFClient(gw_group=gw_group, traddr=traddr).stub.create_subsystem(
                 NVMeoFClient.pb2.create_subsystem_req(
-                    subsystem_nqn=nqn, max_namespaces=max_namespaces, enable_ha=enable_ha
+                    subsystem_nqn=nqn, serial_number=serial_number ,max_namespaces=max_namespaces, enable_ha=enable_ha,
+                    no_group_append=no_group_append, dhchap_key=dhchap_key
                 )
             )
 
@@ -316,7 +319,7 @@ else:
             },
         )
         @pick("namespaces")
-        @NvmeofCLICommand("nvmeof ns list", model.NamespaceList)
+        @NvmeofCLICommand("nvmeof namespace list", model.NamespaceList)
         @convert_to_model(model.NamespaceList)
         @handle_nvmeof_error
         def list(self, nqn: str, gw_group: Optional[str] = None, traddr: Optional[str] = None):
@@ -333,7 +336,7 @@ else:
             },
         )
         @pick("namespaces", first=True)
-        @NvmeofCLICommand("nvmeof ns get", model.NamespaceList)
+        @NvmeofCLICommand("nvmeof namespace get", model.NamespaceList)
         @convert_to_model(model.NamespaceList)
         @handle_nvmeof_error
         def get(self, nqn: str, nsid: str, gw_group: Optional[str] = None,
@@ -352,7 +355,7 @@ else:
                 "gw_group": Param(str, "NVMeoF gateway group", True, None),
             },
         )
-        @NvmeofCLICommand("nvmeof ns get_io_stats", model.NamespaceIOStats)
+        @NvmeofCLICommand("nvmeof namespace get_io_stats", model.NamespaceIOStats)
         @convert_to_model(model.NamespaceIOStats)
         @handle_nvmeof_error
         def io_stats(self, nqn: str, nsid: str, gw_group: Optional[str] = None,
@@ -385,7 +388,7 @@ else:
                 )
             },
         )
-        @NvmeofCLICommand("nvmeof ns add", model.NamespaceCreation)
+        @NvmeofCLICommand("nvmeof namespace add", model.NamespaceCreation)
         @convert_to_model(model.NamespaceCreation)
         @handle_nvmeof_error
         def create(
@@ -442,7 +445,7 @@ else:
                 "traddr": Param(str, "NVMeoF gateway address", True, None),
             },
         )
-        @NvmeofCLICommand("nvmeof ns set_qos", model=model.RequestStatus)
+        @NvmeofCLICommand("nvmeof namespace set_qos", model=model.RequestStatus)
         @convert_to_model(model.RequestStatus)
         @handle_nvmeof_error
         def set_qos(
@@ -484,7 +487,7 @@ else:
                 "traddr": Param(str, "NVMeoF gateway address", True, None),
             },
         )
-        @NvmeofCLICommand("nvmeof ns change_load_balancing_group", model=model.RequestStatus)
+        @NvmeofCLICommand("nvmeof namespace change_load_balancing_group", model=model.RequestStatus)
         @convert_to_model(model.RequestStatus)
         @handle_nvmeof_error
         def change_load_balancing_group(
@@ -516,7 +519,7 @@ else:
                 "traddr": Param(str, "NVMeoF gateway address", True, None),
             },
         )
-        @NvmeofCLICommand("nvmeof ns resize", model=model.RequestStatus)
+        @NvmeofCLICommand("nvmeof namespace resize", model=model.RequestStatus)
         @convert_to_model(model.RequestStatus)
         @handle_nvmeof_error
         def resize(
@@ -553,7 +556,7 @@ else:
                 "traddr": Param(str, "NVMeoF gateway address", True, None),
             },
         )
-        @NvmeofCLICommand("nvmeof ns add_host", model=model.RequestStatus)
+        @NvmeofCLICommand("nvmeof namespace add_host", model=model.RequestStatus)
         @convert_to_model(model.RequestStatus)
         @handle_nvmeof_error
         def add_host(
@@ -584,7 +587,7 @@ else:
                 "traddr": Param(str, "NVMeoF gateway address", True, None),
             },
         )
-        @NvmeofCLICommand("nvmeof ns del_host", model=model.RequestStatus)
+        @NvmeofCLICommand("nvmeof namespace del_host", model=model.RequestStatus)
         @convert_to_model(model.RequestStatus)
         @handle_nvmeof_error
         def del_host(
@@ -615,7 +618,7 @@ else:
                 "traddr": Param(str, "NVMeoF gateway address", True, None),
             },
         )
-        @NvmeofCLICommand("nvmeof ns change_visibility", model=model.RequestStatus)
+        @NvmeofCLICommand("nvmeof namespace change_visibility", model=model.RequestStatus)
         @convert_to_model(model.RequestStatus)
         @handle_nvmeof_error
         def change_visibility(
@@ -652,7 +655,7 @@ else:
                 "traddr": Param(str, "NVMeoF gateway address", True, None),
             },
         )
-        @NvmeofCLICommand("nvmeof ns set_auto_resize", model=model.RequestStatus)
+        @NvmeofCLICommand("nvmeof namespace set_auto_resize", model=model.RequestStatus)
         @convert_to_model(model.RequestStatus)
         @handle_nvmeof_error
         def set_auto_resize(
@@ -684,7 +687,7 @@ else:
                 "traddr": Param(str, "NVMeoF gateway address", True, None),
             },
         )
-        @NvmeofCLICommand("nvmeof ns set_rbd_trash_image", model=model.RequestStatus)
+        @NvmeofCLICommand("nvmeof namespace set_rbd_trash_image", model=model.RequestStatus)
         @convert_to_model(model.RequestStatus)
         @handle_nvmeof_error
         def set_rbd_trash_image(
@@ -717,7 +720,7 @@ else:
                 "traddr": Param(str, "NVMeoF gateway address", True, None),
             },
         )
-        @NvmeofCLICommand("nvmeof ns refresh_size", model=model.RequestStatus)
+        @NvmeofCLICommand("nvmeof namespace refresh_size", model=model.RequestStatus)
         @convert_to_model(model.RequestStatus)
         @handle_nvmeof_error
         def refresh_size(
@@ -751,7 +754,7 @@ else:
             },
         )
         @pick("namespaces", first=True)
-        @NvmeofCLICommand("nvmeof ns update", model.NamespaceList)
+        @NvmeofCLICommand("nvmeof namespace update", model.NamespaceList)
         @convert_to_model(model.NamespaceList)
         @handle_nvmeof_error
         def update(
@@ -835,7 +838,7 @@ else:
             },
         )
         @empty_response
-        @NvmeofCLICommand("nvmeof ns del", model.RequestStatus)
+        @NvmeofCLICommand("nvmeof namespace del", model.RequestStatus)
         @convert_to_model(model.RequestStatus)
         @handle_nvmeof_error
         def delete(
@@ -877,7 +880,7 @@ else:
         @convert_to_model(model.HostsInfo, finalize=_update_hosts)
         @handle_nvmeof_error
         def list(
-            self, nqn: str, clear_alerts: Optional[bool],
+            self, nqn: str, clear_alerts: Optional[bool] = None,
             gw_group: Optional[str] = None, traddr: Optional[str] = None
         ):
             return NVMeoFClient(gw_group=gw_group, traddr=traddr).stub.list_hosts(
