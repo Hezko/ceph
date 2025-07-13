@@ -385,7 +385,8 @@ else:
                 )
             },
         )
-        @NvmeofCLICommand("nvmeof ns add", model.NamespaceCreation)
+        @NvmeofCLICommand("nvmeof ns add", model.NamespaceCreation,
+                          size_params=['size', 'rbd_image_size'])
         @convert_to_model(model.NamespaceCreation)
         @handle_nvmeof_error
         def create(
