@@ -207,6 +207,26 @@ class TestNvmeofCLICommand:
         del NvmeofCLICommand.COMMANDS[test_alias]
         assert test_cmd not in NvmeofCLICommand.COMMANDS
         assert test_alias not in NvmeofCLICommand.COMMANDS
+        
+    
+    def test_command_with_omitted_param(self):
+        test_cmd = "test command3"
+        test_param = 'param2'
+
+        class Model(NamedTuple):
+            a: str
+            b: int
+
+        @NvmeofCLICommand(test_cmd, Model, omit_param=test_param)
+        def func(_, param1:str, param2:str): # noqa # pylint: disable=unused-variable
+            return {'a': '1', 'b': 2}
+
+        NvmeofCLICommand.COMMANDS[test_cmd]
+        assert test_param not in NvmeofCLICommand.COMMANDS[test_cmd].arg_spec
+        result = NvmeofCLICommand.COMMANDS[test_cmd].call(MagicMock(), {'param1': 'hello'})
+
+        del NvmeofCLICommand.COMMANDS[test_cmd]
+        assert test_cmd not in NvmeofCLICommand.COMMANDS
 
 
 class TestNVMeoFConfCLI(unittest.TestCase, CLICommandTestMixin):

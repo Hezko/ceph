@@ -1,6 +1,9 @@
 # -*- coding: utf-8 -*-
 import errno
+import functools
+import inspect
 import json
+
 from abc import ABC, abstractmethod
 from typing import Annotated, Any, Dict, List, NamedTuple, Optional, Type, \
     Union, get_args, get_origin, get_type_hints
@@ -229,24 +232,84 @@ class AnnotatedDataTextOutputFormatter(OutputFormatter):
 class NvmeofCLICommand(CLICommand):
     desc: str
 
-    def __init__(self, prefix, model: Type[NamedTuple], alias=None, perm='rw', poll=False):
+    def __init__(self, prefix: str, model: Type[NamedTuple], alias: str=None,
+                 omit_param: str=None, perm='rw', poll=False):
         super().__init__(prefix, perm, poll)
         self._output_formatter = AnnotatedDataTextOutputFormatter()
         self._model = model
         self._alias = alias
+        self._omit_param = omit_param
 
     def _use_api_endpoint_desc_if_available(self, func):
         if not self.desc and hasattr(func, 'doc_info'):
             self.desc = func.doc_info.get('summary', '')
 
+    def _remove_param(self, func, param_name):
+        """
+        Return a new function with the same behavior as `func`
+        but without the parameter `param_name`.
+        """
+        sig = inspect.signature(func)
+
+        # Ensure parameter exists
+        if param_name not in sig.parameters:
+            raise ValueError(f"Parameter {param_name} not found in {func.__name__}.")
+
+        # Build a new signature without the unwanted param
+        new_params = [
+            p for name, p in sig.parameters.items() if name != param_name
+        ]
+        new_sig = sig.replace(parameters=new_params)
+
+        @functools.wraps(func)
+        def wrapper(*args, **kwargs):
+            bound = new_sig.bind(*args, **kwargs)   # only accepts new signature args
+            bound.apply_defaults()
+
+            # Re-add removed parameter with default = None (or something else)
+            call_args = bound.arguments
+            call_args[param_name] = None  
+
+            return func(**call_args)
+
+        # Attach the new signature so help() and IDEs show the right params
+        wrapper.__signature__ = new_sig
+        return wrapper
+
     def __call__(self, func) -> HandlerFuncType:  # type: ignore
+        func_to_register = self._remove_param(func, self._omit_param) if self._omit_param else func
+        # if self._omit_param:
+        #     raise ValueError(f"{str(self._omit_param)} ||| {inspect.signature(func_to_register)} ||| {inspect.signature(func)}")
         if self._alias:
-            NvmeofCLICommand(self._alias, model=self._model)._register_handler(func)
-
-        resp = super().__call__(func)
-        self._use_api_endpoint_desc_if_available(func)
+            NvmeofCLICommand(self._alias, model=self._model)._register_handler(func_to_register)
+        before = self.arg_spec
+        resp = super().__call__(func_to_register)
+        if self._omit_param:
+            from typing import Tuple
+            def _extract_target_func(
+                f: HandlerFuncType
+            ) -> Tuple[HandlerFuncType, Dict[str, Any]]:
+                """In order to interoperate with other decorated functions,
+                we need to find the original function which will provide
+                the main set of arguments. While we descend through the
+                stack of wrapped functions, gather additional arguments
+                the decorators may want to provide.
+                """
+                # use getattr to keep mypy happy
+                wrapped = getattr(f, "__wrapped__", None)
+                if not wrapped:
+                    return f, {}
+                extra_args: Dict[str, Any] = {}
+                while wrapped is not None:
+                    extra_args.update(getattr(f, "extra_args", {}))
+                    f = wrapped
+                    wrapped = getattr(f, "__wrapped__", None)
+                return f, extra_args
+            f, extra_args = _extract_target_func(func_to_register)
+            raise ValueError(f"wrapped: {inspect.signature(getattr(func_to_register,__wrapped__))}, before: {str(before)}, after: {str(self.arg_spec)}, sig: {inspect.signature(func_to_register)}, target: {inspect.signature(f)}")
+        self._use_api_endpoint_desc_if_available(func_to_register)
         return resp
-
+    
     def call(self,
              mgr: Any,
              cmd_dict: Dict[str, Any],

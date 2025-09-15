@@ -427,7 +427,8 @@ else:
             )
 
         @NvmeofCLICommand(
-            "nvmeof namespace add", model.NamespaceCreation, alias="nvmeof ns add"
+            "nvmeof namespace add", model.NamespaceCreation, alias="nvmeof ns add", 
+            omit_param='rbd_image_size'
         )
         @EndpointDoc(
             "Create a new NVMeoF namespace",
