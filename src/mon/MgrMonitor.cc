@@ -89,6 +89,7 @@ static const std::map<uint32_t, std::set<std::string>>& always_on_modules() {
 #endif
     "pg_autoscaler",
     "telemetry",
+    "nvmeof",
   };
   static const std::map<uint32_t, std::set<std::string>> always_on_modules_map = {
     { CEPH_RELEASE_OCTOPUS, octopus_modules },
