@@ -540,7 +540,7 @@ class TestNvmeofCLICommandSuccessMessage:
         assert test_cmd not in NvmeofCLICommand.COMMANDS
         assert test_alias not in NvmeofCLICommand.COMMANDS
 
-    def test_map_failure_falls_back_to_default_output(self):
+    def test_map_failure_does_not_break_template_rendering(self):
         test_cmd = "nvmeof map failure fallback"
 
         class Model(NamedTuple):
@@ -562,14 +562,7 @@ class TestNvmeofCLICommandSuccessMessage:
             {"format": "plain", "a": "ignored"}
         )
         assert res.retval == 0
-        # falls back to default output formatter, same style as your other test
-        assert res.stdout == (
-            "+-+\n"
-            "|A|\n"
-            "+-+\n"
-            "|b|\n"
-            "+-+"
-        )
+        assert res.stdout == "value b"
         assert res.stderr == ''
 
         del NvmeofCLICommand.COMMANDS[test_cmd]

@@ -5,7 +5,7 @@ import errno
 import inspect
 import json
 import logging
-from typing import Annotated, Any, Callable, Dict, List, NamedTuple, Optional, Type, \
+from typing import Annotated, Any, Callable, Dict, List, Mapping, NamedTuple, Optional, Type, \
     Union, get_args, get_origin, get_type_hints
 import yaml
 
@@ -289,6 +289,53 @@ class NvmeofCLICommand(CLICommand):
         self._use_api_endpoint_desc_if_available(func)
         return resp
 
+    def _use_api_endpoint_desc_if_available(self, func):
+        if not self.desc and hasattr(func, 'doc_info'):
+            self.desc = func.doc_info.get('summary', '')
+
+    def _compute_func_defaults(self) -> Dict[str, Any]:
+        defaults: Dict[str, Any] = {}
+        sig = inspect.signature(self.func)
+
+        for name, param in sig.parameters.items():
+            if name in CLICommand.KNOWN_ARGS:
+                continue
+            if name not in self.arg_spec:
+                continue
+            if param.default is not inspect.Parameter.empty:
+                defaults[name] = param.default
+                
+        return defaults
+
+    def _stringify(self, value: Any) -> str:
+        if isinstance(value, (bytes, bytearray)):
+            try:
+                return value.decode('utf-8', errors='replace')
+            except Exception:
+                return str(value)
+
+        if isinstance(value, (list, tuple)):
+            try:
+                return ','.join(self._stringify(v) for v in value)
+            except Exception:
+                return str(value)
+
+        return str(value)
+
+    def _args_map_from_argspec(self,
+                           cmd_dict: Dict[str, Any],
+                           inbuf: Optional[str] = None) -> Dict[str, Any]:
+        kwargs, specials = self._collect_args_by_argspec(cmd_dict)
+
+        # Some tests/mock paths may yield None.
+        kwargs = kwargs or {}
+        specials = specials or {}
+
+        if inbuf and 'inbuf' in specials:
+            kwargs['inbuf'] = inbuf
+
+        return {**self._func_defaults, **kwargs}
+
     def _apply_single_map_spec(self, spec: Any, raw: Any, fields: Dict[str, Any]) -> Any:
         """
         spec can be:
@@ -320,11 +367,59 @@ class NvmeofCLICommand(CLICommand):
                                field, self.prefix, exc_info=True)
         return out
 
-    def _format_success_message_from_args(self, args_map, response):
+    def _format_success_message_from_args(self,
+                                      args_map: Dict[str, Any],
+                                      response: Any) -> Optional[str]:
         if not self._success_message_template:
             return None
-        fields = {**args_map, **response}
-        fields = self._apply_success_message_map(fields)
-        return self._success_message_template.format(
-            **{k: self._stringify(v) for k, v in fields.items()}
-        )
+
+        # Normalize response to a mapping. Some commands/decorators may return None.
+        resp_map: Dict[str, Any]
+        if isinstance(response, Mapping):
+            resp_map = dict(response)
+        else:
+            resp_map = {}
+
+        try:
+            fields_dict = {**args_map, **resp_map}
+            fields_dict = self._apply_success_message_map(fields_dict)
+            str_map = {k: self._stringify(v) for k, v in fields_dict.items()}
+            return self._success_message_template.format(**str_map)
+        except Exception:
+            logger.warning("Success message template failed for %s", self.prefix, exc_info=True)
+            return None
+        
+    def call(self,
+             mgr: Any,
+             cmd_dict: Dict[str, Any],
+             inbuf: Optional[str] = None) -> HandleCommandResult:
+        try:
+            out_format = cmd_dict.get('format')
+            args_map = self._args_map_from_argspec(cmd_dict, inbuf)
+            ret = super().call(mgr, cmd_dict, inbuf)
+            if ret is None:
+                ret = {}
+            if out_format == 'plain' or not out_format:
+                message: Optional[str] = None
+                try:
+                    message = self._format_success_message_from_args(args_map, ret)
+                except Exception:
+                    logger.warning("Formatting of success message failed for %s",
+                                   self.prefix, exc_info=True)
+                if message:
+                    out = message
+                else:
+                    out = self._output_formatter.format_output(ret, self._model)
+
+            elif out_format == 'json':
+                out = json.dumps(ret, indent=4)
+            elif out_format == 'yaml':
+                out = yaml.dump(ret)
+            else:
+                return HandleCommandResult(-errno.EINVAL, '',
+                                           f"format '{out_format}' is not implemented")
+
+            return HandleCommandResult(0, out, '')
+
+        except Exception as e:  # pylint: disable=broad-except
+            return HandleCommandResult(-errno.EINVAL, '', str(e))
