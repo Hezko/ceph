@@ -2004,9 +2004,6 @@ class NvmeofServiceSpec(ServiceSpec):
         #  TODO: what other parameters should be validated as part of this function?
         super(NvmeofServiceSpec, self).validate()
 
-        if not self.pool:
-            raise SpecValidationError('Cannot add NVMEOF: No Pool specified')
-
         verify_boolean(self.enable_auth, "Enable authentication")
         if self.enable_auth or self.ssl:
             if self.certificate_source == CertificateSource.INLINE.value:
