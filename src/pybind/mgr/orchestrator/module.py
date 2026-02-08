@@ -2108,9 +2108,9 @@ Usage:
         return self._apply_misc([spec], dry_run, format, no_overwrite)
 
     @_cli_write_command('orch apply nvmeof')
-    def _apply_nvmeof(self,* ,
+    def _apply_nvmeof(self,
+                      pool: str,
                       group: str,
-                      pool: str = '.nvmeof',
                       placement: Optional[str] = None,
                       unmanaged: bool = False,
                       dry_run: bool = False,
@@ -2120,10 +2120,9 @@ Usage:
         """Scale an nvmeof service"""
         if inbuf:
             raise OrchestratorValidationError('unrecognized command -i; -h or --help for usage')
-        cleanpool = pool.replace(".", "")
-        service_id = f'{cleanpool}.{group}' if group else cleanpool,
+
         spec = NvmeofServiceSpec(
-            service_id=service_id,
+            service_id=f'{pool}.{group}' if group else pool,
             pool=pool,
             group=group,
             placement=PlacementSpec.from_string(placement),
