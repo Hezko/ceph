@@ -2107,6 +2107,130 @@ Usage:
 
         return self._apply_misc([spec], dry_run, format, no_overwrite)
 
+
+    @_cli_write_command('orch tomer1')
+    def _tomer1(self, *,
+                pool: str,
+                group: str,
+                placement: Optional[str] = None,
+                unmanaged: bool = False,
+                dry_run: bool = False,
+                format: Format = Format.plain,
+                no_overwrite: bool = False,
+                inbuf: Optional[str] = None) -> HandleCommandResult:
+        """Scale an nvmeof service"""
+        if inbuf:
+            raise OrchestratorValidationError('unrecognized command -i; -h or --help for usage')
+
+        spec = NvmeofServiceSpec(
+            service_id=f'{pool}.{group}' if group else pool,
+            pool=pool,
+            group=group,
+            placement=PlacementSpec.from_string(placement),
+            unmanaged=unmanaged,
+            preview_only=dry_run
+        )
+
+        spec.validate()  # force any validation exceptions to be caught correctly
+
+        return self._apply_misc([spec], dry_run, format, no_overwrite)
+    
+    
+    @_cli_write_command('orch tomer2')
+    def _tomer2(self, *,
+                group: str,
+                pool: str = ".nvmeof",
+                placement: Optional[str] = None,
+                unmanaged: bool = False,
+                dry_run: bool = False,
+                format: Format = Format.plain,
+                no_overwrite: bool = False,
+                inbuf: Optional[str] = None) -> HandleCommandResult:
+        """Scale an nvmeof service"""
+        if inbuf:
+            raise OrchestratorValidationError('unrecognized command -i; -h or --help for usage')
+
+        spec = NvmeofServiceSpec(
+            service_id=f'{pool}.{group}' if group else pool,
+            pool=pool,
+            group=group,
+            placement=PlacementSpec.from_string(placement),
+            unmanaged=unmanaged,
+            preview_only=dry_run
+        )
+
+        spec.validate()  # force any validation exceptions to be caught correctly
+
+        return self._apply_misc([spec], dry_run, format, no_overwrite)
+    
+    @_cli_write_command('orch tomer3')
+    def _tomer3(self, *,
+                group: str,
+                pool: str = ".nvmeof",
+                placement: Optional[str] = None,
+                unmanaged: bool = False,
+                dry_run: bool = False,
+                format: Format = Format.plain,
+                no_overwrite: bool = False,
+                inbuf: Optional[str] = None) -> HandleCommandResult:
+        """Scale an nvmeof service"""
+        if inbuf:
+            raise OrchestratorValidationError('unrecognized command -i; -h or --help for usage')
+
+        cleanpool = pool.replace('.', '')
+        spec = NvmeofServiceSpec(
+            service_id=f'{cleanpool}.{group}' if group else cleanpool,
+            pool=pool,
+            group=group,
+            placement=PlacementSpec.from_string(placement),
+            unmanaged=unmanaged,
+            preview_only=dry_run
+        )
+
+        spec.validate()  # force any validation exceptions to be caught correctly
+
+        return self._apply_misc([spec], dry_run, format, no_overwrite)
+    
+    @_cli_write_command('orch tomer4')
+    def _tomer4(self, *args, **kwargs
+                # group: str,
+                # pool: str = ".nvmeof",
+                # placement: Optional[str] = None,
+                # unmanaged: bool = False,
+                # dry_run: bool = False,
+                # format: Format = Format.plain,
+                # no_overwrite: bool = False,
+                # inbuf: Optional[str] = None
+                ) -> HandleCommandResult:
+        """Scale an nvmeof service. supports only name arguments, no positional arguments allowed"""
+        if len(args) > 0:
+            raise OrchestratorValidationError('positional arguments are not supported please use name arguments; -h or --help for usage')
+        pool = kwargs.get('pool', '.nvmeof')
+        group = kwargs.get('group')
+        placement = kwargs.get('placement')
+        unmanaged = kwargs.get('unmanaged', False)
+        dry_run = kwargs.get('dry_run', False)
+        format = kwargs.get('format', Format.plain)
+        no_overwrite = kwargs.get('no_overwrite', False)
+        inbuf = kwargs.get('inbuf')
+        
+        if inbuf:
+            raise OrchestratorValidationError('unrecognized command -i; -h or --help for usage')
+
+        cleanpool = pool.replace('.', '')
+        spec = NvmeofServiceSpec(
+            service_id=f'{cleanpool}.{group}' if group else cleanpool,
+            pool=pool,
+            group=group,
+            placement=PlacementSpec.from_string(placement),
+            unmanaged=unmanaged,
+            preview_only=dry_run
+        )
+
+        spec.validate()  # force any validation exceptions to be caught correctly
+
+        return self._apply_misc([spec], dry_run, format, no_overwrite)
+    
     @_cli_write_command('orch apply nvmeof')
     def _apply_nvmeof(self,
                       pool: str,
