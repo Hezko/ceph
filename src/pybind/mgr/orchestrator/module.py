@@ -2234,9 +2234,14 @@ Usage:
     
     @_cli_write_command('orch tomer5')
     def _apply_nvmeof(self,
-                      _end_positional_: int = 0,
-                      pool: str = ".nvmeof",
-                      group: str = None,
+                      # 1. The trigger to make everything keyword-only
+                      _end_positional_: Any = None,
+                    
+                      # 2. These MUST have defaults because they follow a default-valued arg
+                      pool: Optional[str] = None,
+                      group: Optional[str] = None,
+                    
+                      # 3. The rest match your original intent
                       placement: Optional[str] = None,
                       unmanaged: bool = False,
                       dry_run: bool = False,
@@ -2244,14 +2249,14 @@ Usage:
                       no_overwrite: bool = False,
                       inbuf: Optional[str] = None) -> HandleCommandResult:
         """Scale an nvmeof service"""
-        if inbuf:
-            raise OrchestratorValidationError('unrecognized command -i; -h or --help for usage')
         if group is None:
             raise OrchestratorValidationError('The --group argument is required')
 
-        cleanpool = pool.replace('.', '')
+        if inbuf:
+            raise OrchestratorValidationError('unrecognized command -i; -h or --help for usage')
+
         spec = NvmeofServiceSpec(
-            service_id=f'{cleanpool}.{group}' if group else cleanpool,
+            service_id=f'{pool}.{group}' if group else pool,
             pool=pool,
             group=group,
             placement=PlacementSpec.from_string(placement),
@@ -2259,11 +2264,20 @@ Usage:
             preview_only=dry_run
         )
 
-        spec.validate()  # force any validation exceptions to be caught correctly
+        spec.validate() 
 
         return self._apply_misc([spec], dry_run, format, no_overwrite)
     
+    @_cli_write_command('orch tomer6')
+    def tomeriko6(self):
+        "blablabla"
+        return HandleCommandResult(stdout="tomer6")
     
+    @_cli_write_command('orch tomer7')
+    def tomeriko6(self, _end_positional_: Any = None, bla=None) -> HandleCommandResult:
+        "blablabla"
+        return HandleCommandResult(stdout="tomer6")
+     
     @_cli_write_command('orch apply nvmeof')
     def _apply_nvmeof(self,
                       pool: str,
