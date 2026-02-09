@@ -2270,13 +2270,13 @@ Usage:
     
     @_cli_write_command('orch tomer6')
     def tomeriko6(self):
-        "blablabla"
+        """blablabla"""
         return HandleCommandResult(stdout="tomer6")
     
     @_cli_write_command('orch tomer7')
-    def tomeriko6(self, _end_positional_: Any = None, bla=None) -> HandleCommandResult:
-        "blablabla"
-        return HandleCommandResult(stdout="tomer6")
+    def tomeriko7(self, _end_positional_: Any = None, bla=None) -> HandleCommandResult:
+        """blablabla"""
+        return HandleCommandResult(stdout="tomer7")
      
     @_cli_write_command('orch apply nvmeof')
     def _apply_nvmeof(self,
