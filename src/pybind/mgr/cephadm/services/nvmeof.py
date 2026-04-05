@@ -50,11 +50,6 @@ class NvmeofService(CephService):
             raise OrchestratorError("pool should be in the spec")
         if spec.group is None:
             raise OrchestratorError("group should be in the spec")
-        # unlike some other config funcs, if this fails we can't
-        # go forward deploying the daemon and then retry later. For
-        # that reason we make no attempt to catch the OrchestratorError
-        # this may raise
-        self.mgr._check_pool_exists(spec.pool, spec.service_name())
 
     def configure_tls(self, spec: NvmeofServiceSpec, daemon_spec: CephadmDaemonDeploySpec) -> None:
         """
